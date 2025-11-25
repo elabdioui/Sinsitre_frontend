@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+/* styles.css — thème clair global */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Inter", sans-serif;
+  background: #f3f4f6;           /* gris clair */
+  color: #111827;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Pour que les pages admin soient centrées */
+.app-page {
+  min-height: calc(100vh - 60px);
+  padding: 32px 0 48px;
+}

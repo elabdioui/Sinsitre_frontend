@@ -1,0 +1,42 @@
+h2 {
+    color: #28a745; /* Use a different color for registration */
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 400;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+    border-color: #28a745; /* Highlight border with the registration color */
+    outline: none;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+}
+
+.register-button {
+    background-color: #28a745; /* Green for registration */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.register-button:hover {
+    background-color: #1e7e34;
+}

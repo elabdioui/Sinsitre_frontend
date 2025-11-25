@@ -1,0 +1,11 @@
+<div class="form-section">
+    <h2>Inscription</h2>
+    <form (ngSubmit)="onSubmit()">
+      <input type="text" [(ngModel)]="user.username" name="username" placeholder="Nom d'utilisateur" required>
+      <input type="email" [(ngModel)]="user.email" name="email" placeholder="Email" required>
+      <input type="password" [(ngModel)]="user.password" name="password" placeholder="Mot de passe" required>
+      <button type="submit">S'inscrire</button>
+    </form>
+    <p>{{ message }}</p>
+  </div>
+
