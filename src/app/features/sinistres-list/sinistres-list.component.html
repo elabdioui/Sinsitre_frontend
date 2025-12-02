@@ -1,162 +1,175 @@
 <!-- src/app/features/sinistres-list/sinistres-list.component.html -->
 
-<section class="page">
-    <div class="shell">
-      <!-- HEADER -->
-      <header class="page-header">
+<div class="container">
+  <!-- En-tête avec statistiques -->
+  <div class="header">
+    <h1>📋 Gestion des Sinistres</h1>
+
+    <div class="stats-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card stat-declare">
+        <div class="stat-value">{{ stats.declare }}</div>
+        <div class="stat-label">Déclarés</div>
+      </div>
+      <div class="stat-card stat-encours">
+        <div class="stat-value">{{ stats.enCours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+      <div class="stat-card stat-valide">
+        <div class="stat-value">{{ stats.valide }}</div>
+        <div class="stat-label">Validés</div>
+      </div>
+      <div class="stat-card stat-rejete">
+        <div class="stat-value">{{ stats.rejete }}</div>
+        <div class="stat-label">Rejetés</div>
+      </div>
+      <div class="stat-card stat-indemnise">
+        <div class="stat-value">{{ stats.indemnise }}</div>
+        <div class="stat-label">Indemnisés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre d'actions et filtres -->
+  <div class="actions-bar">
+    <a routerLink="/sinistres/create" class="btn btn-primary">
+      ➕ Nouveau Sinistre
+    </a>
+
+    <div class="filters">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="🔍 Rechercher (numéro, description, client...)"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+
+      <select
+        class="status-filter"
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onStatusChange()"
+      >
+        <option *ngFor="let option of statusOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="alert alert-danger">
+    <strong>❌ Erreur:</strong> {{ error }}
+    <button class="btn-retry" (click)="loadSinistres()">🔄 Réessayer</button>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-large"></div>
+    <p>Chargement des sinistres...</p>
+  </div>
+
+  <!-- Aucun résultat -->
+  <div *ngIf="!loading && filteredSinistres.length === 0 && !error" class="no-results">
+    <div class="no-results-icon">📭</div>
+    <h3>Aucun sinistre trouvé</h3>
+    <p *ngIf="searchTerm || selectedStatus !== 'ALL'">
+      Essayez de modifier vos critères de recherche
+    </p>
+    <p *ngIf="!searchTerm && selectedStatus === 'ALL'">
+      Commencez par déclarer votre premier sinistre
+    </p>
+    <a routerLink="/sinistres/create" class="btn btn-primary">
+      Déclarer un sinistre
+    </a>
+  </div>
+
+  <!-- Liste des sinistres -->
+  <div *ngIf="!loading && filteredSinistres.length > 0" class="sinistres-grid">
+    <div *ngFor="let sinistre of filteredSinistres" class="sinistre-card">
+      <!-- En-tête de la carte -->
+      <div class="card-header">
         <div>
-          <h1>Gestion des sinistres</h1>
-          <p>Suivi des déclarations de sinistres et de leurs statuts.</p>
+          <h3>{{ sinistre.numeroSinistre || '#' + sinistre.id }}</h3>
+          <span [class]="'status-badge ' + getStatusClass(sinistre.statut)">
+            {{ getStatusLabel(sinistre.statut) }}
+          </span>
         </div>
-  
-        <div class="header-actions">
-          <div class="chips">
-            <span class="chip chip--neutral">
-              Total : <strong>{{ totalSinistres }}</strong>
-            </span>
-            <span class="chip chip--blue">
-              Déclarés : <strong>{{ declares }}</strong>
-            </span>
-            <span class="chip chip--green">
-              Validés : <strong>{{ valides }}</strong>
-            </span>
-            <span class="chip chip--red">
-              Refusés : <strong>{{ refuses }}</strong>
-            </span>
-          </div>
-  
-          <button type="button" class="btn-secondary" (click)="loadSinistres()">
-            ⟳ Actualiser
+        <div class="card-actions">
+          <button class="btn-icon" title="Modifier" disabled>✏️</button>
+          <button class="btn-icon btn-danger" (click)="deleteSinistre(sinistre)" title="Supprimer">
+            🗑️
           </button>
         </div>
-      </header>
-  
-      <!-- CARD PRINCIPALE -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2>Liste des sinistres</h2>
-            <p>Vue globale des demandes d’indemnisation des clients.</p>
-          </div>
+      </div>
+
+      <!-- Corps de la carte -->
+      <div class="card-body">
+        <div class="info-row">
+          <span class="info-label">👤 Client:</span>
+          <span class="info-value">{{ sinistre.clientNom || 'Non renseigné' }}</span>
         </div>
-  
-        <div class="card-body">
-          <!-- États -->
-          <div *ngIf="loading" class="state state--info">
-            Chargement des sinistres...
-          </div>
-  
-          <div *ngIf="error && !loading" class="state state--error">
-            {{ error }}
-          </div>
-  
-          <div
-            *ngIf="!loading && !error && (!sinistres || sinistres.length === 0)"
-            class="empty"
+
+        <div class="info-row">
+          <span class="info-label">📧 Email:</span>
+          <span class="info-value">{{ sinistre.clientEmail || 'N/A' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">📅 Date:</span>
+          <span class="info-value">{{ formatDate(sinistre.dateDeclaration) }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">💰 Montant:</span>
+          <span class="info-value montant">{{ formatMontant(sinistre.montantDemande) }}</span>
+        </div>
+
+        <div class="description">
+          <span class="info-label">📝 Description:</span>
+          <p>{{ sinistre.description || 'Aucune description' }}</p>
+        </div>
+      </div>
+
+      <!-- Actions de changement de statut -->
+      <div class="card-footer">
+        <div class="status-actions">
+          <button
+            *ngIf="sinistre.statut === SinistreStatus.DECLARE"
+            class="btn btn-sm btn-info"
+            (click)="updateStatut(sinistre, SinistreStatus.EN_COURS)"
           >
-            <div class="empty-icon">📝</div>
-            <h3>Aucun sinistre enregistré</h3>
-            <p>
-              Aucun sinistre n’a encore été déclaré. Les enregistrements
-              apparaîtront ici.
-            </p>
-          </div>
-  
-          <!-- TABLEAU -->
-          <div
-            *ngIf="!loading && !error && sinistres && sinistres.length > 0"
-            class="table-wrapper"
+            ⏳ Passer en cours
+          </button>
+
+          <button
+            *ngIf="sinistre.statut === SinistreStatus.EN_COURS"
+            class="btn btn-sm btn-success"
+            (click)="updateStatut(sinistre, SinistreStatus.VALIDE)"
           >
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>N° sinistre</th>
-                  <th>Client</th>
-                  <th>Montant demandé</th>
-                  <th>Description</th>
-                  <th>Statut</th>
-                  <th class="col-actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let s of sinistres">
-                  <td>
-                    <span class="strong">{{
-                      s.numeroSinistre || ('#' + s.id)
-                    }}</span>
-                  </td>
-                  <td>
-                    <div class="cell-main">
-                      <span class="cell-title">
-                        Client {{ s.clientId }}
-                      </span>
-                      <span class="cell-sub">
-                        {{ s.clientNom || 'Nom non disponible' }}
-                      </span>
-                      <span class="cell-sub subtle">
-                        {{ s.clientEmail || 'Email non disponible' }}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="strong">
-                      {{ s.montantDemande || 0 | number: '1.0-0' }} DH
-                    </span>
-                  </td>
-                  <td class="col-description">
-                    {{ s.description || '—' }}
-                  </td>
-                  <td>
-                    <span
-                      class="status-pill"
-                      [ngClass]="{
-                        'status-pill--gray': s.statut === 'DECLARE',
-                        'status-pill--blue': s.statut === 'EN_COURS',
-                        'status-pill--green': s.statut === 'VALIDE',
-                        'status-pill--red': s.statut === 'REFUSE'
-                      }"
-                    >
-                      {{ s.statut || 'N/A' }}
-                    </span>
-                  </td>
-                  <td class="col-actions">
-                    <div class="actions">
-                      <button
-                        type="button"
-                        class="btn-ghost-small"
-                        (click)="updateStatut(s, 'EN_COURS')"
-                      >
-                        En cours
-                      </button>
-                      <button
-                        type="button"
-                        class="btn-ghost-small btn-ghost-small--green"
-                        (click)="updateStatut(s, 'VALIDE')"
-                      >
-                        Valider
-                      </button>
-                      <button
-                        type="button"
-                        class="btn-ghost-small btn-ghost-small--red"
-                        (click)="updateStatut(s, 'REFUSE')"
-                      >
-                        Refuser
-                      </button>
-                      <button
-                        type="button"
-                        class="btn-link-danger"
-                        (click)="deleteSinistre(s)"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            ✅ Valider
+          </button>
+
+          <button
+            *ngIf="sinistre.statut === SinistreStatus.EN_COURS"
+            class="btn btn-sm btn-danger"
+            (click)="updateStatut(sinistre, SinistreStatus.REJETE)"
+          >
+            ❌ Rejeter
+          </button>
+
+          <button
+            *ngIf="sinistre.statut === SinistreStatus.VALIDE"
+            class="btn btn-sm btn-warning"
+            (click)="updateStatut(sinistre, SinistreStatus.INDEMNISE)"
+          >
+            💰 Indemniser
+          </button>
         </div>
       </div>
     </div>
-  </section>
-  
+  </div>
+</div>

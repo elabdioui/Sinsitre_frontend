@@ -1,17 +1,36 @@
-// src/app/models/sinistre.model.ts
-
-export type SinistreStatus = 'DECLARE' | 'EN_COURS' | 'VALIDE' | 'REFUSE';
+export enum SinistreStatus {
+  DECLARE = 'DECLARE',
+  EN_COURS = 'EN_COURS',
+  VALIDE = 'VALIDE',
+  REJETE = 'REJETE',
+  INDEMNISE = 'INDEMNISE'
+}
 
 export interface Sinistre {
   id?: number;
   numeroSinistre?: string;
-
-  description?: string;
-  montantDemande?: number;
-
-  statut?: SinistreStatus;
-
+  description: string;
+  dateDeclaration?: Date | string;
+  montantDemande: number;
+  montantApprouve?: number;
+  statut: SinistreStatus;
   clientId: number;
   clientNom?: string;
   clientEmail?: string;
+  contratId?: number;
+  dateTraitement?: Date | string;
+  commentaire?: string;
 }
+
+export interface CreateSinistreDTO {
+  description: string;
+  montantDemande: number;
+  clientId: number;
+  contratId?: number;
+}
+
+
+
+
+
+
