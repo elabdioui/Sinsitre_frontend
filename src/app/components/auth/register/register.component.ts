@@ -14,17 +14,20 @@ import { CommonModule } from '@angular/common';
 export class RegisterComponent {
   user = { username: '', email: '', password: '' };
   message = '';
+  isError = false;  // 🔹 manquait !
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     this.authService.register(this.user).subscribe({
       next: (response) => {
-        this.message = response.message;
+        this.isError = false;
+        this.message = response.message ?? 'Inscription réussie';
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
-      error: () => {
-        this.message = 'Erreur lors de l’inscription';
+      error: (err) => {
+        this.isError = true;
+        this.message = err.error?.message ?? "Erreur lors de l'inscription";
       }
     });
   }

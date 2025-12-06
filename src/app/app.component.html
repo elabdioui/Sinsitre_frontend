@@ -1,8 +1,31 @@
-<nav>
-  <a routerLink="/login">Connexion</a>
-  <a routerLink="/register">Inscription</a>
-</nav>
+<nav class="main-nav">
+  <!-- Logo / Nom de l'appli -->
+  <div class="nav-left">
+    <div class="logo-mark">S</div>
+    <div class="logo-text">
+      <span class="logo-title">SINISTRE MANAGER</span>
+      <span class="logo-subtitle">Gestion des sinistres</span>
+    </div>
+  </div>
 
-<hr>
+  <!-- Boutons Connexion / Inscription -->
+  <div class="nav-right">
+    <button
+      type="button"
+      routerLink="/login"
+      class="btn-nav btn-outline"
+    >
+      Connexion
+    </button>
+
+    <button
+      type="button"
+      routerLink="/register"
+      class="btn-nav btn-filled"
+    >
+      Inscription
+    </button>
+  </div>
+</nav>
 
 <router-outlet></router-outlet>

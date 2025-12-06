@@ -1,65 +1,111 @@
-/* --- Global Body & Layout Styles --- */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6; /* Light gray/off-white background */
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+.main-nav {
+  width: 100%;
+  padding: 12px 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Style the main container that holds the forms */
-.auth-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Deeper shadow */
-    width: 100%;
-    max-width: 400px;
-    margin: 20px;
-    transition: transform 0.3s ease;
+/* Logo à gauche */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* --- Navigation & Links Styles --- */
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #eee;
-    margin-bottom: 20px;
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #111827;
 }
 
-a {
-    text-decoration: none;
-    color: #007bff;
-    font-weight: 600;
-    padding: 8px 15px;
-    border-radius: 6px;
-    transition: background-color 0.3s, color 0.3s;
+.logo-text {
+  display: flex;
+  flex-direction: column;
 }
 
-a:hover {
-    color: white;
-    background-color: #007bff;
+.logo-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111827;
 }
 
-hr {
-    display: none; /* Hide the HR since we're using separate components */
+.logo-subtitle {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #6b7280;
 }
 
-/* --- Utility Styles for Messages --- */
-.message {
-    text-align: center;
-    font-size: 14px;
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 15px;
+/* Boutons à droite */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+
+.btn-nav {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Bouton Connexion (outline) */
+.btn-outline {
+  border-color: #111827;
+  color: #111827;
+  background-color: #ffffff;
+}
+
+.btn-outline:hover {
+  background-color: #111827;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.25);
+}
+
+/* Bouton Inscription (plein) */
+.btn-filled {
+  background-color: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.btn-filled:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.35);
+}
+
+/* Responsive léger */
+@media (max-width: 600px) {
+  .main-nav {
+    padding: 10px 16px;
+  }
+
+  .logo-subtitle {
+    display: none; /* pour alléger sur mobile */
+  }
+
+  .btn-nav {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }

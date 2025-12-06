@@ -1,42 +1,290 @@
-h2 {
-    color: #007bff;
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: 400;
+/* PAGE GLOBALE */
+.auth-page {
+  min-height: 100vh;
+  background-color: #f7f7f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-form {
-    display: flex;
+/* CONTAINER PRINCIPAL 2 COLONNES */
+.auth-container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  gap: 32px;
+  align-items: stretch;
+}
+
+/* GAUCHE */
+.auth-left {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 40px 48px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Logo + titre */
+.brand-block {
+  margin-bottom: 32px;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* FORMULAIRE */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 38px 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.input-wrapper input::placeholder {
+  color: #9ca3af;
+}
+
+.input-wrapper input:focus {
+  background-color: #ffffff;
+  border-color: #111827;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.15);
+}
+
+/* Icône champ */
+.field-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Ligne “se souvenir de moi” */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -4px;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.checkbox-label input {
+  width: 14px;
+  height: 14px;
+}
+
+/* Bouton */
+.btn-primary {
+  margin-top: 8px;
+  width: 100%;
+  background-color: #111827;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.btn-primary:hover {
+  background-color: #000000;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Messages feedback */
+.feedback-message {
+  margin-top: 16px;
+  font-size: 12px;
+}
+
+.success-msg {
+  color: #15803d;
+}
+
+.error-msg {
+  color: #b91c1c;
+}
+
+/* Liens bas de formulaire */
+.login-footer-links {
+  margin-top: 24px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.login-footer-links a {
+  color: #111827;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login-footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* DROITE : CARTE IMAGE + TEXTE */
+.auth-right {
+  flex: 1.1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.visual-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.5);
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+}
+
+/* Image de fond type “néon” sinistre */
+.visual-image {
+  height: 260px;
+  background-image: url('/assets/images/sinistre-hero.jpg'); /* 👉 mets ton image ici */
+  background-size: cover;
+  background-position: center;
+}
+
+/* Texte blanc par dessus (en bas de la carte) */
+.visual-text {
+  padding: 22px 22px 26px;
+  color: #f9fafb;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+}
+
+.visual-text h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.visual-text p {
+  margin: 0;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+
+/* RESPONSIVE */
+@media (max-width: 960px) {
+  .auth-container {
     flex-direction: column;
-    gap: 15px;
+    max-width: 480px;
+  }
+
+  .auth-right {
+    order: -1;
+    margin-bottom: 16px;
+  }
+
+  .auth-left {
+    padding: 28px 24px;
+  }
 }
 
-input {
-    padding: 12px 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
+@media (max-width: 480px) {
+  .auth-right {
+    display: none;
+  }
 
-input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
-}
-
-.login-button {
-    background-color: #007bff; /* Use blue for consistency */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-.login-button:hover {
-    background-color: #0056b3;
+  .auth-container {
+    max-width: 420px;
+  }
 }
