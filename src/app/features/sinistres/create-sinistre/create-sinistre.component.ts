@@ -1,9 +1,9 @@
+// src/app/features/create-sinistre/create-sinistre.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SinistreService } from '../../services/sinistre.service';
-import { CreateSinistreDTO } from '../../models/sinistre.model';
+import { SinistreService, SinistreCreateDTO } from '../../../services/sinistre.service';
 
 @Component({
   selector: 'app-create-sinistre',
@@ -13,16 +13,17 @@ import { CreateSinistreDTO } from '../../models/sinistre.model';
   styleUrls: ['./create-sinistre.component.css']
 })
 export class CreateSinistreComponent {
-  sinistre: CreateSinistreDTO = {
+  sinistre: SinistreCreateDTO = {
+    clientId: 0,
+    contractId: 0,
     description: '',
     montantDemande: 0,
-    clientId: 1, // À remplacer par l'ID du client connecté
-    contratId: undefined
+    dateSinistre: ''
   };
 
   loading = false;
   error: string | null = null;
-  success: string | null = null;
+  success = false;
 
   constructor(
     private sinistreService: SinistreService,
@@ -30,32 +31,44 @@ export class CreateSinistreComponent {
   ) {}
 
   onSubmit(): void {
+    // Validation
     if (!this.validateForm()) {
       return;
     }
 
     this.loading = true;
     this.error = null;
-    this.success = null;
 
     this.sinistreService.create(this.sinistre).subscribe({
-      next: (response) => {
-        this.success = `Sinistre ${response.numeroSinistre} créé avec succès !`;
+      next: (created) => {
+        console.log('Sinistre créé:', created);
+        this.success = true;
         this.loading = false;
 
         // Redirection après 2 secondes
         setTimeout(() => {
-          this.router.navigate(['/sinistres']);
+          this.router.navigate(['/admin/sinistres']);
         }, 2000);
       },
       error: (err) => {
-        this.error = err.message;
+        console.error('Erreur création:', err);
+        this.error = err.error?.message || 'Erreur lors de la création du sinistre';
         this.loading = false;
       }
     });
   }
 
   validateForm(): boolean {
+    if (!this.sinistre.clientId || this.sinistre.clientId <= 0) {
+      this.error = 'Veuillez entrer un ID client valide';
+      return false;
+    }
+
+    if (!this.sinistre.contractId || this.sinistre.contractId <= 0) {
+      this.error = 'Veuillez entrer un ID contrat valide';
+      return false;
+    }
+
     if (!this.sinistre.description || this.sinistre.description.trim().length < 10) {
       this.error = 'La description doit contenir au moins 10 caractères';
       return false;
@@ -66,22 +79,17 @@ export class CreateSinistreComponent {
       return false;
     }
 
-    if (this.sinistre.montantDemande > 1000000) {
-      this.error = 'Le montant demandé ne peut pas dépasser 1 000 000 €';
+    if (!this.sinistre.dateSinistre) {
+      this.error = 'Veuillez sélectionner la date du sinistre';
       return false;
     }
 
     return true;
   }
 
-  resetForm(): void {
-    this.sinistre = {
-      description: '',
-      montantDemande: 0,
-      clientId: 1,
-      contratId: undefined
-    };
-    this.error = null;
-    this.success = null;
+  cancel(): void {
+    if (confirm('Annuler la création du sinistre ?')) {
+      this.router.navigate(['/admin/sinistres']);
+    }
   }
 }

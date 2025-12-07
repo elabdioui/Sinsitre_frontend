@@ -4,8 +4,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Sinistre, SinistreStatus } from '../../models/sinistre.model';
-import { SinistreService } from '../../services/sinistre.service';
+import { Sinistre, SinistreStatus } from '../../../shared/models/sinistre.model';
+import { SinistreService } from '../../../core/services/sinistre.service';
 
 @Component({
   selector: 'app-sinistres-list',

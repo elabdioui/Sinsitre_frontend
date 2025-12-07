@@ -1,11 +1,15 @@
+// src/app/app.component.ts
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, NavbarComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {}
+export class AppComponent {
+  title = 'Sinistre Manager';
+}

@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { ContractService } from '../services/contract.service';
-import { Contract, ContractStatus } from '../models/contract.model';
+import { ContractService } from '../../../core/services/contract.service';
+import { Contract, ContractStatus } from '../../../shared/models/contract.model';
 
 @Component({
   selector: 'app-admin-dashboard',

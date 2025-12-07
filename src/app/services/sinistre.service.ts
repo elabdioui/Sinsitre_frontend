@@ -1,10 +1,49 @@
 // src/app/services/sinistre.service.ts
-
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { Sinistre, SinistreStatus, CreateSinistreDTO } from '../models/sinistre.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+/** 📊 Statuts possibles d'un sinistre */
+export enum SinistreStatus {
+  DECLARE = 'DECLARE',
+  EN_COURS = 'EN_COURS',
+  VALIDE = 'VALIDE',
+  REJETE = 'REJETE',
+  INDEMNISE = 'INDEMNISE'
+}
+
+/** 📋 Interface Sinistre */
+export interface Sinistre {
+  id?: number;
+  numeroSinistre?: string;
+  clientId: number;
+  contractId: number;
+  description: string;
+  dateSinistre?: string;
+  dateDeclaration?: string;
+  montantDemande: number;
+  montantApprouve?: number;
+  statut: SinistreStatus;
+
+  // Données enrichies
+  clientNom?: string;
+  clientEmail?: string;
+}
+
+/** ✏️ DTO pour création */
+export interface SinistreCreateDTO {
+  clientId: number;
+  contractId: number;
+  description: string;
+  dateSinistre: string;
+  montantDemande: number;
+}
+
+/** 🔄 DTO pour changement de statut */
+export interface SinistreUpdateStatusDTO {
+  statut: SinistreStatus;
+  montantApprouve?: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -14,114 +53,55 @@ export class SinistreService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Récupérer tous les sinistres
-   */
+  /** 📋 Récupérer tous les sinistres */
   getAll(): Observable<Sinistre[]> {
-    return this.http.get<Sinistre[]>(this.baseUrl).pipe(
-      tap(data => console.log('Sinistres récupérés:', data)),
-      catchError(this.handleError)
-    );
+    return this.http.get<Sinistre[]>(this.baseUrl);
   }
 
-  /**
-   * Récupérer un sinistre par ID
-   */
+  /** 🔍 Récupérer un sinistre par ID */
   getById(id: number): Observable<Sinistre> {
-    return this.http.get<Sinistre>(`${this.baseUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.get<Sinistre>(`${this.baseUrl}/${id}`);
   }
 
-  /**
-   * Récupérer les sinistres d'un client
-   */
+  /** 🔍 Récupérer les sinistres d'un client */
   getByClientId(clientId: number): Observable<Sinistre[]> {
-    return this.http.get<Sinistre[]>(`${this.baseUrl}/client/${clientId}`).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.get<Sinistre[]>(`${this.baseUrl}/client/${clientId}`);
   }
 
-  /**
-   * Récupérer les sinistres d'un contrat
-   */
-  getByContratId(contratId: number): Observable<Sinistre[]> {
-    return this.http.get<Sinistre[]>(`${this.baseUrl}/contrat/${contratId}`).pipe(
-      catchError(this.handleError)
-    );
+  /** 🔍 Récupérer les sinistres d'un contrat */
+  getByContractId(contractId: number): Observable<Sinistre[]> {
+    return this.http.get<Sinistre[]>(`${this.baseUrl}/contract/${contractId}`);
   }
 
-  /**
-   * Créer un nouveau sinistre
-   */
-  create(sinistre: CreateSinistreDTO): Observable<Sinistre> {
-    return this.http.post<Sinistre>(this.baseUrl, sinistre).pipe(
-      tap(data => console.log('Sinistre créé:', data)),
-      catchError(this.handleError)
-    );
+  /** ➕ Créer un nouveau sinistre */
+  create(sinistre: SinistreCreateDTO): Observable<Sinistre> {
+    return this.http.post<Sinistre>(this.baseUrl, sinistre);
   }
 
-  /**
-   * Mettre à jour le statut d'un sinistre
-   */
-  updateStatut(id: number, statut: SinistreStatus): Observable<Sinistre> {
-    return this.http.put<Sinistre>(`${this.baseUrl}/${id}/statut`, { statut }).pipe(
-      tap(data => console.log('Statut mis à jour:', data)),
-      catchError(this.handleError)
-    );
+  /** 🔄 Mettre à jour le statut d'un sinistre */
+  updateStatus(id: number, data: SinistreUpdateStatusDTO): Observable<Sinistre> {
+    return this.http.put<Sinistre>(`${this.baseUrl}/${id}`, data);
   }
 
-  /**
-   * Mettre à jour un sinistre complet
-   */
-  update(id: number, sinistre: Partial<Sinistre>): Observable<Sinistre> {
-    return this.http.put<Sinistre>(`${this.baseUrl}/${id}`, sinistre).pipe(
-      catchError(this.handleError)
-    );
+  /** ✅ Valider un sinistre */
+  valider(id: number, montantApprouve: number): Observable<Sinistre> {
+    return this.updateStatus(id, {
+      statut: SinistreStatus.VALIDE,
+      montantApprouve
+    });
   }
 
-  /**
-   * Supprimer un sinistre
-   */
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+  /** ❌ Rejeter un sinistre */
+  rejeter(id: number): Observable<Sinistre> {
+    return this.updateStatus(id, {
+      statut: SinistreStatus.REJETE
+    });
   }
 
-  /**
-   * Gestion centralisée des erreurs
-   */
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'Une erreur est survenue';
-
-    if (error.error instanceof ErrorEvent) {
-      // Erreur côté client
-      errorMessage = `Erreur: ${error.error.message}`;
-    } else {
-      // Erreur côté serveur
-      switch (error.status) {
-        case 0:
-          errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
-          break;
-        case 400:
-          errorMessage = 'Données invalides. Vérifiez votre saisie.';
-          break;
-        case 401:
-          errorMessage = 'Non autorisé. Veuillez vous reconnecter.';
-          break;
-        case 404:
-          errorMessage = 'Ressource non trouvée.';
-          break;
-        case 500:
-          errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
-          break;
-        default:
-          errorMessage = `Erreur ${error.status}: ${error.message}`;
-      }
-    }
-
-    console.error('Erreur HTTP:', error);
-    return throwError(() => new Error(errorMessage));
+  /** 💰 Indemniser un sinistre */
+  indemniser(id: number): Observable<Sinistre> {
+    return this.updateStatus(id, {
+      statut: SinistreStatus.INDEMNISE
+    });
   }
 }

@@ -1,31 +1,7 @@
-<nav class="main-nav">
-  <!-- Logo / Nom de l'appli -->
-  <div class="nav-left">
-    <div class="logo-mark">S</div>
-    <div class="logo-text">
-      <span class="logo-title">SINISTRE MANAGER</span>
-      <span class="logo-subtitle">Gestion des sinistres</span>
-    </div>
-  </div>
+<!-- src/app/app.component.html -->
 
-  <!-- Boutons Connexion / Inscription -->
-  <div class="nav-right">
-    <button
-      type="button"
-      routerLink="/login"
-      class="btn-nav btn-outline"
-    >
-      Connexion
-    </button>
+<!-- Navbar (visible uniquement si connecté) -->
+<app-navbar></app-navbar>
 
-    <button
-      type="button"
-      routerLink="/register"
-      class="btn-nav btn-filled"
-    >
-      Inscription
-    </button>
-  </div>
-</nav>
-
+<!-- Contenu principal de l'application -->
 <router-outlet></router-outlet>
