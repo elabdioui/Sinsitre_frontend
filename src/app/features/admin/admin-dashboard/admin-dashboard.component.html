@@ -1,111 +1,65 @@
 <!-- src/app/admin-dashboard/admin-dashboard.component.html -->
 
-<section class="admin-layout">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-logo">A</div>
-        <div class="brand-text">
-          <span class="brand-title">AssurFlow</span>
-          <span class="brand-subtitle">Admin Panel</span>
-        </div>
+<div class="dashboard-container">
+  <!-- HEADER -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Tableau de Bord</h1>
+        <p class="subtitle">Vue d'ensemble de vos contrats d'assurance</p>
       </div>
-  
-      <nav class="sidebar-nav">
-        <a
-          class="nav-item"
-          routerLink="/admin/dashboard"
-          routerLinkActive="is-active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="nav-icon">🏠</span>
-          <span class="nav-label">Dashboard</span>
-        </a>
-  
-        <a
-          class="nav-item"
-          routerLink="/admin/contracts"
-          routerLinkActive="is-active"
-        >
-          <span class="nav-icon">📑</span>
-          <span class="nav-label">Contrats</span>
-        </a>
-  
-        <a
-          class="nav-item"
-          routerLink="/admin/sinistres"
-          routerLinkActive="is-active"
-        >
-          <span class="nav-icon">⚠️</span>
-          <span class="nav-label">Sinistres</span>
-        </a>
-      </nav>
-  
-      <div class="sidebar-footer">
-        <span class="badge-env">ENV · TEST</span>
-        <span class="sidebar-version">v1.0.0</span>
+      <button type="button" class="btn-refresh" (click)="loadContracts()">
+        <span class="icon">🔄</span>
+        <span>Actualiser</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalContracts }}</div>
+        <div class="stat-label">Total Contrats</div>
       </div>
-    </aside>
-  
-    <!-- CONTENU PRINCIPAL -->
-    <main class="page-shell">
-      <div class="page-inner">
-        <!-- Header -->
-        <header class="page-header">
-          <div>
-            <h1>Dashboard Admin</h1>
-            <p>Vue globale des contrats d'assurance et de leur état.</p>
-          </div>
-  
-          <div class="header-actions">
-            <span class="badge-count">
-              <span class="dot"></span>
-              {{ totalContracts }} contrat(s)
-            </span>
-  
-            <button type="button" class="btn-ghost" (click)="loadContracts()">
-              ⟳ Actualiser
-            </button>
-          </div>
-        </header>
-  
-        <!-- Stat cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-label">TOTAL CONTRATS</span>
-            <span class="stat-value">{{ totalContracts }}</span>
-            <span class="stat-sub">Tous statuts confondus</span>
-          </div>
-  
-          <div class="stat-card stat-card--green">
-            <span class="stat-label">ACTIFS</span>
-            <span class="stat-value">{{ activeContracts }}</span>
-            <span class="stat-sub">En cours de couverture</span>
-          </div>
-  
-          <div class="stat-card stat-card--red">
-            <span class="stat-label">ANNULÉS</span>
-            <span class="stat-value">{{ canceledContracts }}</span>
-            <span class="stat-sub">Résiliés ou annulés</span>
-          </div>
-  
-          <div class="stat-card stat-card--amber">
-            <span class="stat-label">EXPIRÉS</span>
-            <span class="stat-value">{{ expiredContracts }}</span>
-            <span class="stat-sub">Hors période de validité</span>
-          </div>
-        </div>
-  
-        <!-- 2 colonnes : création + liste -->
-        <div class="grid-main">
-          <!-- Colonne gauche : création -->
-          <div class="card">
-            <div class="card-header">
-              <h2>Créer un nouveau contrat</h2>
-              <p>Renseignez les informations du contrat puis enregistrez-le.</p>
-            </div>
-  
-            <div class="card-body">
+    </div>
+
+    <div class="stat-card stat-active">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ activeContracts }}</div>
+        <div class="stat-label">Actifs</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-canceled">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ canceledContracts }}</div>
+        <div class="stat-label">Annulés</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-expired">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ expiredContracts }}</div>
+        <div class="stat-label">Expirés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-grid">
+    <!-- FORMULAIRE DE CRÉATION -->
+    <div class="form-card">
+      <div class="card-header">
+        <h2>➕ Créer un nouveau contrat</h2>
+        <p>Renseignez les informations du contrat</p>
+      </div>
+
+      <div class="card-body">
               <form
                 class="form-grid"
                 (ngSubmit)="createContract()"
@@ -120,7 +74,7 @@
                     required
                   />
                 </div>
-  
+
                 <div class="field">
                   <label>Type de contrat *</label>
                   <input
@@ -131,7 +85,7 @@
                     required
                   />
                 </div>
-  
+
                 <div class="field">
                   <label>Prime annuelle (DH) *</label>
                   <input
@@ -141,7 +95,7 @@
                     required
                   />
                 </div>
-  
+
                 <div class="field">
                   <label>Début du contrat *</label>
                   <input
@@ -151,7 +105,7 @@
                     required
                   />
                 </div>
-  
+
                 <div class="field">
                   <label>Fin du contrat *</label>
                   <input
@@ -161,7 +115,7 @@
                     required
                   />
                 </div>
-  
+
                 <div class="form-footer">
                   <button
                     class="btn-primary"
@@ -170,35 +124,35 @@
                   >
                     {{ creating ? 'Création...' : 'Créer le contrat' }}
                   </button>
-  
+
                   <span class="hint">
                     Tous les champs marqués * sont obligatoires.
                   </span>
                 </div>
-  
+
                 <div *ngIf="createError" class="state state--error">
                   {{ createError }}
                 </div>
               </form>
             </div>
           </div>
-  
-          <!-- Colonne droite : liste rapide -->
-          <div class="card">
-            <div class="card-header">
-              <h2>Contrats existants</h2>
-              <p>Suivi des statuts, montants et périodes de couverture.</p>
-            </div>
-  
-            <div class="card-body">
+
+    <!-- LISTE DES CONTRATS -->
+    <div class="list-card">
+      <div class="card-header">
+        <h2>📋 Contrats existants</h2>
+        <p>Suivi en temps réel de vos contrats</p>
+      </div>
+
+      <div class="card-body">
               <div *ngIf="loading" class="state state--info">
                 Chargement des contrats...
               </div>
-  
+
               <div *ngIf="error && !loading" class="state state--error">
                 {{ error }}
               </div>
-  
+
               <div
                 *ngIf="
                   !loading && !error && contracts && contracts.length === 0
@@ -207,7 +161,7 @@
               >
                 Aucun contrat pour le moment. Créez votre premier contrat à gauche.
               </div>
-  
+
               <div
                 *ngIf="
                   !loading && !error && contracts && contracts.length > 0
@@ -262,8 +216,5 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </main>
-  </section>
-  
+  </div>
+</div>

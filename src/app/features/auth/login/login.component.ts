@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -18,8 +18,21 @@ export class LoginComponent {
 
   // 👉 variable pour afficher le JWT
   jwtToken: string | null = null;
+  private returnUrl: string = '/admin/dashboard';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    // Récupérer l'URL de retour si elle existe
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
+
+    // Rediriger si déjà connecté
+    if (localStorage.getItem('token')) {
+      this.router.navigate([this.returnUrl]);
+    }
+  }
 
   onSubmit() {
     this.message = '';
@@ -31,6 +44,11 @@ export class LoginComponent {
         // on récupère le token + message du backend
         localStorage.setItem('token', response.token);
 
+        // Stocker les informations utilisateur si disponibles
+        if (response.user) {
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+
         // 👉 on le met aussi dans une variable pour l'afficher
         this.jwtToken = response.token;
         console.log('JWT reçu : ', this.jwtToken); // debug console
@@ -38,9 +56,9 @@ export class LoginComponent {
         this.isError = false;
         this.message = response.message || 'Connexion réussie ✅';
 
-        // Redirection après 1,5 seconde (tu peux changer la route)
+        // Redirection vers l'URL demandée ou le dashboard
         setTimeout(() => {
-          this.router.navigate(['/home']); // par ex. /home ou /dashboard
+          this.router.navigate([this.returnUrl]);
         }, 1500);
       },
       error: (err) => {

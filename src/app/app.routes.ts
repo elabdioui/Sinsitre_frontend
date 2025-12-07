@@ -8,42 +8,69 @@ import { CreateSinistreComponent } from './features/sinistres/create-sinistre/cr
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // Accueil
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  // Redirection de la racine vers le dashboard si connecté, sinon vers login
+  {
+    path: '',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full'
+  },
 
   // Routes d'authentification (publiques)
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  {
+    path: 'login',
+    component: LoginComponent,
+    title: 'Connexion - Sinistre Manager'
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+    title: 'Inscription - Sinistre Manager'
+  },
 
   // Routes d'administration (protégées)
   {
-    path: 'admin/dashboard',
-    component: AdminDashboardComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'admin/contracts',
-    component: ContractsListComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'admin/sinistres',
-    component: SinistresListComponent,
-    canActivate: [authGuard]
+    path: 'admin',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        component: AdminDashboardComponent,
+        title: 'Dashboard - Sinistre Manager'
+      },
+      {
+        path: 'contracts',
+        component: ContractsListComponent,
+        title: 'Contrats - Sinistre Manager'
+      },
+      {
+        path: 'sinistres',
+        component: SinistresListComponent,
+        title: 'Sinistres - Sinistre Manager'
+      }
+    ]
   },
 
   // Routes des sinistres (protégées)
   {
     path: 'sinistres',
-    component: SinistresListComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'sinistres/create',
-    component: CreateSinistreComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        component: SinistresListComponent,
+        title: 'Liste des Sinistres - Sinistre Manager'
+      },
+      {
+        path: 'create',
+        component: CreateSinistreComponent,
+        title: 'Nouveau Sinistre - Sinistre Manager'
+      }
+    ]
   },
 
-  // Route wildcard pour les pages non trouvées
-  { path: '**', redirectTo: 'login' }
+  // Route wildcard - rediriger vers dashboard si connecté, sinon vers login
+  {
+    path: '**',
+    redirectTo: 'admin/dashboard'
+  }
 ];

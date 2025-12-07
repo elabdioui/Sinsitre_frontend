@@ -2,20 +2,21 @@
 
 .navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 16px rgba(102, 126, 234, 0.2);
   position: sticky;
   top: 0;
   z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 70px;
+  height: 72px;
 }
 
 /* ==================== BRAND ==================== */
@@ -32,17 +33,23 @@
 }
 
 .brand-icon {
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   background: white;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 800;
   color: #667eea;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
+  transition: all 0.3s ease;
+}
+
+.nav-brand:hover .brand-icon {
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
+  transform: rotate(-5deg) scale(1.05);
 }
 
 .brand-text {
@@ -51,17 +58,19 @@
 }
 
 .brand-name {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: white;
   line-height: 1;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .brand-tagline {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   margin-top: 0.25rem;
+  font-weight: 500;
 }
 
 /* ==================== HAMBURGER (Mobile) ==================== */
@@ -105,44 +114,53 @@
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   padding: 0.75rem 1.25rem;
   color: white;
   text-decoration: none;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  overflow: hidden;
 }
 
 .nav-link::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 3px;
-  background: white;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover {
-  background: rgba(255, 255, 255, 0.15);
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .nav-link:hover::before {
-  width: 100%;
+  left: 100%;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 .nav-link-primary {
-  background: rgba(255, 255, 255, 0.25) !important;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.3) !important;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.nav-link-primary:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
 }
 
 .link-icon {
@@ -159,22 +177,23 @@
 .btn-logout {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: rgba(255, 255, 255, 0.15);
+  gap: 0.625rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(239, 68, 68, 0.9);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-logout:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(220, 38, 38, 1);
   border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .logout-icon {
