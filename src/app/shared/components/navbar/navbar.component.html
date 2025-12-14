@@ -52,6 +52,17 @@
       </a>
 
       <a
+        routerLink="/admin/health"
+        routerLinkActive="active"
+        (click)="closeMenu()"
+        class="nav-link"
+        title="Vérifier l'état des services backend"
+      >
+        <span class="link-icon">🏥</span>
+        <span class="link-text">Health</span>
+      </a>
+
+      <a
         routerLink="/sinistres/create"
         routerLinkActive="active"
         (click)="closeMenu()"

@@ -31,7 +31,7 @@ export class AdminDashboardComponent implements OnInit {
 
   newContract: Contract = {
     clientId: 0,
-    type: '',
+    type: 'AUTO' as any,
     primeAnnuelle: 0,
     startDate: '',
     endDate: '',
@@ -50,19 +50,19 @@ export class AdminDashboardComponent implements OnInit {
 
   get activeContracts(): number {
     return this.contracts.filter(
-      (c) => c.status === this.contractStatusEnum.ACTIVE
+      (c) => c.statut === this.contractStatusEnum.ACTIVE
     ).length;
   }
 
   get canceledContracts(): number {
     return this.contracts.filter(
-      (c) => c.status === this.contractStatusEnum.CANCELED
+      (c) => c.statut === this.contractStatusEnum.CANCELED
     ).length;
   }
 
   get expiredContracts(): number {
     return this.contracts.filter(
-      (c) => c.status === this.contractStatusEnum.EXPIRED
+      (c) => c.statut === this.contractStatusEnum.EXPIRED
     ).length;
   }
 
@@ -99,7 +99,7 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.newContract = {
           clientId: 0,
-          type: '',
+          type: 'AUTO' as any,
           primeAnnuelle: 0,
           startDate: '',
           endDate: '',

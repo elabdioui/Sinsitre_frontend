@@ -31,7 +31,11 @@ export class ContractsListComponent implements OnInit {
   };
 
   // Enum pour le template
-  ContractStatus = ContractStatus;
+  readonly contractStatusValues = {
+    ACTIVE: 'ACTIVE' as ContractStatus,
+    CANCELED: 'CANCELED' as ContractStatus,
+    EXPIRED: 'EXPIRED' as ContractStatus
+  };
   statusOptions = [
     { value: 'ALL', label: 'Tous les statuts' },
     { value: 'ACTIVE', label: '✅ Actifs' },
@@ -67,9 +71,9 @@ export class ContractsListComponent implements OnInit {
 
   calculateStats(): void {
     this.stats.total = this.contracts.length;
-    this.stats.active = this.contracts.filter(c => c.status === 'ACTIVE').length;
-    this.stats.canceled = this.contracts.filter(c => c.status === 'CANCELED').length;
-    this.stats.expired = this.contracts.filter(c => c.status === 'EXPIRED').length;
+    this.stats.active = this.contracts.filter(c => c.statut === 'ACTIVE').length;
+    this.stats.canceled = this.contracts.filter(c => c.statut === 'CANCELED').length;
+    this.stats.expired = this.contracts.filter(c => c.statut === 'EXPIRED').length;
   }
 
   applyFilters(): void {
@@ -77,7 +81,7 @@ export class ContractsListComponent implements OnInit {
 
     // Filtre par statut
     if (this.selectedStatus !== 'ALL') {
-      filtered = filtered.filter(c => c.status === this.selectedStatus);
+      filtered = filtered.filter(c => c.statut === this.selectedStatus);
     }
 
     // Filtre par recherche

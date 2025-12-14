@@ -3,6 +3,14 @@
 /** 📊 Statuts possibles d'un contrat */
 export type ContractStatus = 'ACTIVE' | 'CANCELED' | 'EXPIRED';
 
+/** 📋 Types de contrats disponibles */
+export enum TypeContrat {
+  AUTO = 'AUTO',
+  HABITATION = 'HABITATION',
+  SANTE = 'SANTE',
+  VIE = 'VIE'
+}
+
 /** 📄 Interface principale pour un Contrat d'Assurance */
 export interface Contract {
   /** ID unique du contrat */
@@ -11,8 +19,11 @@ export interface Contract {
   /** ID du client propriétaire */
   clientId: number;
 
-  /** Type de contrat (ex: "Auto", "Habitation", "Santé") */
-  type: string;
+  /** Numéro du contrat (généré par le backend) */
+  numero?: string;
+
+  /** Type de contrat */
+  type: TypeContrat;
 
   /** Prime annuelle en euros */
   primeAnnuelle: number;
@@ -24,7 +35,7 @@ export interface Contract {
   endDate: string;
 
   /** Statut actuel du contrat */
-  status: ContractStatus;
+  statut: ContractStatus;
 
   // Données enrichies depuis le service Auth
   /** Nom complet du client (enrichi) */
@@ -37,7 +48,7 @@ export interface Contract {
 /** ✏️ DTO pour la création d'un contrat */
 export interface ContractCreateDTO {
   clientId: number;
-  type: string;
+  type: TypeContrat;
   primeAnnuelle: number;
   startDate: string;
   endDate: string;
@@ -45,10 +56,10 @@ export interface ContractCreateDTO {
 
 /** 🔄 DTO pour la mise à jour d'un contrat */
 export interface ContractUpdateDTO {
-  type?: string;
+  type?: TypeContrat;
   primeAnnuelle?: number;
   endDate?: string;
-  status?: ContractStatus;
+  statut?: ContractStatus;
 }
 
 /** 📊 Labels et couleurs pour l'affichage des statuts */

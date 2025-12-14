@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { Sinistre, SinistreStatus, CreateSinistreDTO } from '../../shared/models/sinistre.model';
-import { environment } from '../../../environments/environment.development';
+import { Sinistre, StatutSinistre, CreateSinistreDTO, UpdateStatutDTO } from '../../shared/models/sinistre.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SinistreService {
-  private readonly baseUrl = `${environment.apiUrl}${environment.endpoints.sinistres}`;
+  private readonly baseUrl = 'http://localhost:8080/sinistres';
 
   constructor(private http: HttpClient) {}
 
@@ -63,9 +62,9 @@ export class SinistreService {
   /**
    * Mettre à jour le statut d'un sinistre
    */
-  updateStatut(id: number, statut: SinistreStatus): Observable<Sinistre> {
-    return this.http.put<Sinistre>(`${this.baseUrl}/${id}/statut`, statut).pipe(
-      tap(data => console.log('Statut mis à jour:', data)),
+  updateStatut(id: number, data: UpdateStatutDTO): Observable<Sinistre> {
+    return this.http.put<Sinistre>(`${this.baseUrl}/${id}/statut`, data).pipe(
+      tap(result => console.log('Statut mis à jour:', result)),
       catchError(this.handleError)
     );
   }
@@ -99,28 +98,39 @@ export class SinistreService {
       errorMessage = `Erreur: ${error.error.message}`;
     } else {
       // Erreur côté serveur
-      switch (error.status) {
-        case 0:
-          errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
-          break;
-        case 400:
-          errorMessage = 'Données invalides. Vérifiez votre saisie.';
-          break;
-        case 401:
-          errorMessage = 'Non autorisé. Veuillez vous reconnecter.';
-          break;
-        case 404:
-          errorMessage = 'Ressource non trouvée.';
-          break;
-        case 500:
-          errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
-          break;
-        default:
-          errorMessage = `Erreur ${error.status}: ${error.message}`;
+      // Si le backend renvoie un message string, l'utiliser
+      if (typeof error.error === 'string') {
+        errorMessage = error.error;
+      } else if (error.error?.message) {
+        errorMessage = error.error.message;
+      } else {
+        switch (error.status) {
+          case 0:
+            errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+            break;
+          case 400:
+            errorMessage = 'Données invalides. Vérifiez votre saisie.';
+            break;
+          case 401:
+            errorMessage = 'Non autorisé. Veuillez vous reconnecter.';
+            break;
+          case 403:
+            errorMessage = 'Accès refusé. Vous n\'avez pas les droits nécessaires.';
+            break;
+          case 404:
+            errorMessage = 'Ressource non trouvée.';
+            break;
+          case 500:
+            errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
+            break;
+          default:
+            errorMessage = `Erreur ${error.status}: ${error.message}`;
+        }
       }
     }
 
-    console.error('Erreur HTTP:', error);
+    console.error('Erreur HTTP complète:', error);
+    console.error('Message d\'erreur:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 }

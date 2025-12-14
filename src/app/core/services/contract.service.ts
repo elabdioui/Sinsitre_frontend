@@ -1,21 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Contract } from '../../shared/models/contract.model';
-import { environment } from '../../../environments/environment.development';
+import { Contract, ContractCreateDTO } from '../../shared/models/contract.model';
+
+export type { Contract };
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContractService {
   // URL du GATEWAY vers le microservice assurance
-  private readonly baseUrl = `${environment.apiUrl}${environment.endpoints.contracts}`;
+  private readonly baseUrl = 'http://localhost:8080/contracts';
 
   constructor(private http: HttpClient) {}
 
   /** GET /contracts */
   getAll(): Observable<Contract[]> {
     return this.http.get<Contract[]>(this.baseUrl);
+  }
+
+  /** GET /contracts/{id} */
+  getById(id: number): Observable<Contract> {
+    return this.http.get<Contract>(`${this.baseUrl}/${id}`);
   }
 
   /** GET /contracts/client/{clientId} */
@@ -31,5 +37,10 @@ export class ContractService {
   /** PATCH /contracts/{id}/cancel */
   cancel(id: number): Observable<any> {
     return this.http.patch(`${this.baseUrl}/${id}/cancel`, {});
+  }
+
+  /** GET /contracts/actifs - Récupère tous les contrats avec statut ACTIVE */
+  getContratsActifs(): Observable<Contract[]> {
+    return this.http.get<Contract[]>(`${this.baseUrl}/actifs`);
   }
 }

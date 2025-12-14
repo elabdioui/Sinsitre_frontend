@@ -18,39 +18,33 @@
       ❌ {{ error }}
     </div>
 
+    <!-- LOADING CONTRATS -->
+    <div *ngIf="loadingContrats" class="alert alert-info">
+      ⏳ Chargement de vos contrats...
+    </div>
+
     <!-- FORMULAIRE -->
-    <form (ngSubmit)="onSubmit()" class="sinistre-form">
+    <form (ngSubmit)="onSubmit()" class="sinistre-form" *ngIf="!loadingContrats">
 
-      <!-- Row 1: Client ID + Contract ID -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="clientId">🧑 ID Client *</label>
-          <input
-            id="clientId"
-            type="number"
-            [(ngModel)]="sinistre.clientId"
-            name="clientId"
-            placeholder="Ex: 1"
-            required
-            min="1"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="contractId">📄 ID Contrat *</label>
-          <input
-            id="contractId"
-            type="number"
-            [(ngModel)]="sinistre.contractId"
-            name="contractId"
-            placeholder="Ex: 1"
-            required
-            min="1"
-          />
-        </div>
+      <!-- Sélection du Contrat -->
+      <div class="form-group full-width">
+        <label for="contratId">📄 Contrat *</label>
+        <select
+          id="contratId"
+          [(ngModel)]="sinistre.contratId"
+          name="contratId"
+          class="form-select"
+          required
+          [disabled]="contratsActifs.length === 0"
+        >
+          <option [value]="0">-- Sélectionnez un contrat --</option>
+          <option *ngFor="let contrat of contratsActifs" [value]="contrat.id">
+            {{ getContratLabel(contrat) }}
+          </option>
+        </select>
       </div>
 
-      <!-- Row 2: Montant + Date -->
+      <!-- Row: Montant + Date -->
       <div class="form-row">
         <div class="form-group">
           <label for="montantDemande">💰 Montant Demandé (€) *</label>

@@ -2,106 +2,75 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-/** 📊 Statuts possibles d'un sinistre */
-export enum SinistreStatus {
-  DECLARE = 'DECLARE',
-  EN_COURS = 'EN_COURS',
-  VALIDE = 'VALIDE',
-  REJETE = 'REJETE',
-  INDEMNISE = 'INDEMNISE'
-}
-
-/** 📋 Interface Sinistre */
-export interface Sinistre {
-  id?: number;
-  numeroSinistre?: string;
-  clientId: number;
-  contractId: number;
-  description: string;
-  dateSinistre?: string;
-  dateDeclaration?: string;
-  montantDemande: number;
-  montantApprouve?: number;
-  statut: SinistreStatus;
-
-  // Données enrichies
-  clientNom?: string;
-  clientEmail?: string;
-}
-
-/** ✏️ DTO pour création */
-export interface SinistreCreateDTO {
-  clientId: number;
-  contractId: number;
-  description: string;
-  dateSinistre: string;
-  montantDemande: number;
-}
-
-/** 🔄 DTO pour changement de statut */
-export interface SinistreUpdateStatusDTO {
-  statut: SinistreStatus;
-  montantApprouve?: number;
-}
+import { Sinistre, CreateSinistreDTO, UpdateStatutDTO, StatutSinistre } from '../shared/models/sinistre.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SinistreService {
+  
   private readonly baseUrl = 'http://localhost:8080/sinistres';
 
   constructor(private http: HttpClient) {}
 
-  /** 📋 Récupérer tous les sinistres */
   getAll(): Observable<Sinistre[]> {
     return this.http.get<Sinistre[]>(this.baseUrl);
   }
 
-  /** 🔍 Récupérer un sinistre par ID */
+
   getById(id: number): Observable<Sinistre> {
     return this.http.get<Sinistre>(`${this.baseUrl}/${id}`);
   }
 
-  /** 🔍 Récupérer les sinistres d'un client */
+
   getByClientId(clientId: number): Observable<Sinistre[]> {
     return this.http.get<Sinistre[]>(`${this.baseUrl}/client/${clientId}`);
   }
 
-  /** 🔍 Récupérer les sinistres d'un contrat */
-  getByContractId(contractId: number): Observable<Sinistre[]> {
-    return this.http.get<Sinistre[]>(`${this.baseUrl}/contract/${contractId}`);
+
+  getByContratId(contratId: number): Observable<Sinistre[]> {
+    return this.http.get<Sinistre[]>(`${this.baseUrl}/contrat/${contratId}`);
   }
 
-  /** ➕ Créer un nouveau sinistre */
-  create(sinistre: SinistreCreateDTO): Observable<Sinistre> {
+
+  create(sinistre: CreateSinistreDTO): Observable<Sinistre> {
     return this.http.post<Sinistre>(this.baseUrl, sinistre);
   }
 
-  /** 🔄 Mettre à jour le statut d'un sinistre */
-  updateStatus(id: number, data: SinistreUpdateStatusDTO): Observable<Sinistre> {
-    return this.http.put<Sinistre>(`${this.baseUrl}/${id}`, data);
+
+  updateStatut(id: number, data: UpdateStatutDTO): Observable<Sinistre> {
+    return this.http.put<Sinistre>(`${this.baseUrl}/${id}/statut`, data);
   }
 
-  /** ✅ Valider un sinistre */
+
+  passerEnCours(id: number): Observable<Sinistre> {
+    return this.updateStatut(id, { statut: StatutSinistre.EN_COURS });
+  }
+
+
   valider(id: number, montantApprouve: number): Observable<Sinistre> {
-    return this.updateStatus(id, {
-      statut: SinistreStatus.VALIDE,
+    return this.updateStatut(id, {
+      statut: StatutSinistre.VALIDE,
       montantApprouve
     });
   }
 
-  /** ❌ Rejeter un sinistre */
+
   rejeter(id: number): Observable<Sinistre> {
-    return this.updateStatus(id, {
-      statut: SinistreStatus.REJETE
+    return this.updateStatut(id, {
+      statut: StatutSinistre.REJETE
     });
   }
 
-  /** 💰 Indemniser un sinistre */
+
   indemniser(id: number): Observable<Sinistre> {
-    return this.updateStatus(id, {
-      statut: SinistreStatus.INDEMNISE
+    return this.updateStatut(id, {
+      statut: StatutSinistre.INDEMNISE
     });
+  }
+
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

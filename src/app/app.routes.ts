@@ -5,6 +5,7 @@ import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-
 import { ContractsListComponent } from './features/contracts/contracts-list/contracts-list.component';
 import { SinistresListComponent } from './features/sinistres/sinistres-list/sinistres-list.component';
 import { CreateSinistreComponent } from './features/sinistres/create-sinistre/create-sinistre.component';
+import { BackendHealthComponent } from './features/admin/backend-health/backend-health.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -46,6 +47,11 @@ export const routes: Routes = [
         path: 'sinistres',
         component: SinistresListComponent,
         title: 'Sinistres - Sinistre Manager'
+      },
+      {
+        path: 'health',
+        component: BackendHealthComponent,
+        title: 'État des Services - Sinistre Manager'
       }
     ]
   },

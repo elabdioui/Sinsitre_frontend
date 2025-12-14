@@ -41,20 +41,26 @@ export class LoginComponent {
 
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        // on récupère le token + message du backend
+        // Stocker le token
         localStorage.setItem('token', response.token);
 
-        // Stocker les informations utilisateur si disponibles
-        if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user));
-        }
+        // Stocker les données utilisateur avec id et role
+        const user = {
+          id: response.userId || response.id,
+          email: response.email || this.credentials.username,
+          nom: response.nom || 'User',
+          prenom: response.prenom || '',
+          role: response.role || 'CLIENT'
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+
+        console.log('Connexion réussie:', user);
 
         // 👉 on le met aussi dans une variable pour l'afficher
         this.jwtToken = response.token;
-        console.log('JWT reçu : ', this.jwtToken); // debug console
 
         this.isError = false;
-        this.message = response.message || 'Connexion réussie ✅';
+        this.message = 'Connexion réussie ✅';
 
         // Redirection vers l'URL demandée ou le dashboard
         setTimeout(() => {

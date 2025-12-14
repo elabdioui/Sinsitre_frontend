@@ -119,7 +119,8 @@ export class SinistresListComponent implements OnInit {
 
     if (!confirmation) return;
 
-    this.sinistreService.updateStatut(sinistre.id, newStatut).subscribe({
+    const updateDto = { statut: newStatut };
+    this.sinistreService.updateStatut(sinistre.id, updateDto).subscribe({
       next: (updated) => {
         // Mettre à jour dans la liste
         const index = this.sinistres.findIndex(s => s.id === updated.id);

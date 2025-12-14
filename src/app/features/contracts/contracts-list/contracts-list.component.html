@@ -108,20 +108,20 @@
             <td class="td-date">{{ formatDate(contract.startDate) }}</td>
             <td class="td-date">{{ formatDate(contract.endDate) }}</td>
             <td class="td-status">
-              <span class="status-badge" [ngClass]="getStatusBadgeClass(contract.status)">
-                {{ getStatusLabel(contract.status) }}
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(contract.statut)">
+                {{ getStatusLabel(contract.statut) }}
               </span>
             </td>
             <td class="td-actions">
               <button
-                *ngIf="contract.status === 'ACTIVE'"
+                *ngIf="contract.statut === 'ACTIVE'"
                 class="btn-cancel"
                 (click)="cancelContract(contract)"
                 title="Annuler le contrat"
               >
                 ❌
               </button>
-              <span *ngIf="contract.status !== 'ACTIVE'" class="no-action">-</span>
+              <span *ngIf="contract.statut !== 'ACTIVE'" class="no-action">-</span>
             </td>
           </tr>
         </tbody>
