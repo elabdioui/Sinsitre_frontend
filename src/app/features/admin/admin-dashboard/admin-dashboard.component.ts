@@ -1,12 +1,18 @@
 // src/app/admin-dashboard/admin-dashboard.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Chart, registerables } from 'chart.js';
 
 import { ContractService } from '../../../core/services/contract.service';
 import { UserService, User } from '../../../core/services/user.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { ChartService } from '../../../core/services/chart.service';
 import { Contract, ContractStatus, TypeContrat } from '../../../shared/models/contract.model';
+
+// Enregistrer les composants Chart.js
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -15,7 +21,16 @@ import { Contract, ContractStatus, TypeContrat } from '../../../shared/models/co
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css'],
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, AfterViewInit {
+  // Références aux canvas pour les graphiques
+  @ViewChild('contractsByTypeChart') contractsByTypeCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('contractsByStatusChart') contractsByStatusCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('premiumDistributionChart') premiumDistributionCanvas?: ElementRef<HTMLCanvasElement>;
+
+  // Instances des graphiques
+  private contractsByTypeChart?: Chart;
+  private contractsByStatusChart?: Chart;
+  private premiumDistributionChart?: Chart;
   contracts: Contract[] = [];
   clients: User[] = [];
   loading = false;
@@ -45,12 +60,18 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private contractService: ContractService,
-    private userService: UserService
+    private userService: UserService,
+    private notificationService: NotificationService,
+    private chartService: ChartService
   ) {}
 
   ngOnInit(): void {
     this.loadContracts();
     this.loadClients();
+  }
+
+  ngAfterViewInit(): void {
+    // Les graphiques seront créés après le chargement des données
   }
 
   /**
@@ -121,6 +142,8 @@ export class AdminDashboardComponent implements OnInit {
       next: (data) => {
         this.contracts = data;
         this.loading = false;
+        // Créer les graphiques après le chargement des données
+        setTimeout(() => this.initCharts(), 100);
       },
       error: (err) => {
         console.error(err);
@@ -128,6 +151,127 @@ export class AdminDashboardComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  /**
+   * Initialise tous les graphiques
+   */
+  private initCharts(): void {
+    this.createContractsByTypeChart();
+    this.createContractsByStatusChart();
+    this.createPremiumDistributionChart();
+  }
+
+  /**
+   * Graphique 1: Répartition des contrats par type
+   */
+  private createContractsByTypeChart(): void {
+    if (!this.contractsByTypeCanvas) return;
+
+    // Compter les contrats par type
+    const typeCounts = new Map<string, number>();
+    this.contracts.forEach(contract => {
+      const type = contract.type || 'Autre';
+      typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
+    });
+
+    const labels = Array.from(typeCounts.keys());
+    const data = Array.from(typeCounts.values());
+
+    const config = this.chartService.getBarChartConfiguration(
+      labels,
+      [{ label: 'Nombre de contrats', data }]
+    );
+
+    this.contractsByTypeChart = new Chart(
+      this.contractsByTypeCanvas.nativeElement,
+      config
+    );
+  }
+
+  /**
+   * Graphique 2: Répartition des contrats par statut
+   */
+  private createContractsByStatusChart(): void {
+    if (!this.contractsByStatusCanvas) return;
+
+    const statusCounts = {
+      'Actifs': this.activeContracts,
+      'Annulés': this.canceledContracts,
+      'Expirés': this.expiredContracts
+    };
+
+    const labels = Object.keys(statusCounts);
+    const data = Object.values(statusCounts);
+    const colors = ['#10b981', '#ef4444', '#f59e0b'];
+
+    const config = this.chartService.getDoughnutChartConfiguration(
+      labels,
+      data,
+      colors
+    );
+
+    this.contractsByStatusChart = new Chart(
+      this.contractsByStatusCanvas.nativeElement,
+      config
+    );
+  }
+
+  /**
+   * Graphique 3: Distribution des primes annuelles
+   */
+  private createPremiumDistributionChart(): void {
+    if (!this.premiumDistributionCanvas) return;
+
+    // Grouper les contrats par type et calculer la prime moyenne
+    const premiumsByType = new Map<string, number[]>();
+    this.contracts.forEach(contract => {
+      const type = contract.type || 'Autre';
+      const premium = contract.primeAnnuelle || 0;
+      if (!premiumsByType.has(type)) {
+        premiumsByType.set(type, []);
+      }
+      premiumsByType.get(type)!.push(premium);
+    });
+
+    // Calculer les moyennes
+    const labels = Array.from(premiumsByType.keys());
+    const averages = labels.map(type => {
+      const primes = premiumsByType.get(type) || [];
+      return primes.length > 0
+        ? Math.round(primes.reduce((a, b) => a + b, 0) / primes.length)
+        : 0;
+    });
+
+    const config = this.chartService.getLineChartConfiguration(
+      labels,
+      [{
+        label: 'Prime annuelle moyenne (DH)',
+        data: averages,
+        borderColor: '#667eea',
+        backgroundColor: 'rgba(102, 126, 234, 0.1)'
+      }]
+    );
+
+    this.premiumDistributionChart = new Chart(
+      this.premiumDistributionCanvas.nativeElement,
+      config
+    );
+  }
+
+  /**
+   * Nettoie les graphiques à la destruction du composant
+   */
+  ngOnDestroy(): void {
+    if (this.contractsByTypeChart) {
+      this.contractsByTypeChart.destroy();
+    }
+    if (this.contractsByStatusChart) {
+      this.contractsByStatusChart.destroy();
+    }
+    if (this.premiumDistributionChart) {
+      this.premiumDistributionChart.destroy();
+    }
   }
 
   createContract(): void {
@@ -160,15 +304,20 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  cancelContract(c: Contract): void {
+  async cancelContract(c: Contract): Promise<void> {
     if (!c.id) return;
-    if (!confirm(`Annuler le contrat #${c.id} ?`)) return;
+
+    const confirmed = await this.notificationService.confirmAction(`Annuler le contrat #${c.id} ?`);
+    if (!confirmed) return;
 
     this.contractService.cancel(c.id).subscribe({
-      next: () => this.loadContracts(),
+      next: () => {
+        this.notificationService.success('Contrat annulé avec succès');
+        this.loadContracts();
+      },
       error: (err) => {
         console.error(err);
-        alert("Erreur lors de l'annulation du contrat.");
+        this.notificationService.error("Erreur lors de l'annulation du contrat.");
       },
     });
   }

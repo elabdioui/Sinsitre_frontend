@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SinistreService } from '../../../core/services/sinistre.service';
 import { ContractService } from '../../../core/services/contract.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { CreateSinistreDTO } from '../../../shared/models/sinistre.model';
 import { Contract } from '../../../shared/models/contract.model';
 
@@ -36,7 +37,8 @@ export class CreateSinistreComponent implements OnInit {
   constructor(
     private sinistreService: SinistreService,
     private contractService: ContractService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -164,8 +166,9 @@ export class CreateSinistreComponent implements OnInit {
   /**
    * Annuler et retourner à la liste
    */
-  cancel(): void {
-    if (confirm('Annuler la création du sinistre ?')) {
+  async cancel(): Promise<void> {
+    const confirmed = await this.notificationService.confirmAction('Annuler la création du sinistre ?');
+    if (confirmed) {
       this.router.navigate(['/admin/sinistres']);
     }
   }

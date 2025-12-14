@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SinistreService } from '../../../core/services/sinistre.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Sinistre, StatutSinistre as SinistreStatus, UpdateStatutDTO } from '../../../shared/models/sinistre.model';
 
 interface Stats {
@@ -66,7 +67,8 @@ export class SinistresListComponent implements OnInit {
   constructor(
     private router: Router,
     private sinistreService: SinistreService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -264,7 +266,7 @@ export class SinistresListComponent implements OnInit {
     this.sinistreService.updateStatut(this.selectedSinistre.id, updateData).subscribe({
       next: (response) => {
         console.log('✅ Statut mis à jour avec succès:', response);
-        alert('Statut modifié avec succès !');
+        this.notificationService.success('Statut modifié avec succès !');
         this.closeGestionModal();
         this.loadSinistres();
       },
@@ -278,7 +280,7 @@ export class SinistresListComponent implements OnInit {
         });
 
         const errorMsg = err.error?.message || err.error || err.message || 'Erreur inconnue';
-        alert('Erreur lors de la mise à jour du statut:\n' + errorMsg);
+        this.notificationService.error('Erreur lors de la mise à jour du statut: ' + errorMsg);
         this.processingStatut = false;
       }
     });
@@ -288,18 +290,22 @@ export class SinistresListComponent implements OnInit {
     return this.authService.isClient();
   }
 
-  deleteSinistre(sinistre: Sinistre): void {
+  async deleteSinistre(sinistre: Sinistre): Promise<void> {
     if (!sinistre.id) return;
 
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le sinistre ${sinistre.numeroSinistre || '#' + sinistre.id} ?`)) {
+    const confirmed = await this.notificationService.confirmAction(
+      `Êtes-vous sûr de vouloir supprimer le sinistre ${sinistre.numeroSinistre || '#' + sinistre.id} ?`
+    );
+
+    if (confirmed) {
       this.sinistreService.delete(sinistre.id).subscribe({
         next: () => {
-          alert('Sinistre supprimé avec succès');
+          this.notificationService.success('Sinistre supprimé avec succès');
           this.loadSinistres();
         },
         error: (err) => {
           console.error('Error deleting sinistre:', err);
-          alert('Erreur lors de la suppression du sinistre.');
+          this.notificationService.error('Erreur lors de la suppression du sinistre.');
         }
       });
     }

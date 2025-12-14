@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ContractService } from '../../../core/services/contract.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Contract, ContractStatus, TypeContrat } from '../../../shared/models/contract.model';
 
 interface Stats {
@@ -52,7 +53,8 @@ export class ContractsListComponent implements OnInit {
 
   constructor(
     private contractService: ContractService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -234,14 +236,16 @@ export class ContractsListComponent implements OnInit {
   /**
    * Cancel a contract
    */
-  cancelContract(contract: Contract): void {
+  async cancelContract(contract: Contract): Promise<void> {
     if (!contract.id) {
       this.error = 'ID du contrat invalide';
       return;
     }
 
     const confirmMessage = `Êtes-vous sûr de vouloir annuler le contrat #${contract.id} ?`;
-    if (!confirm(confirmMessage)) {
+    const confirmed = await this.notificationService.confirmAction(confirmMessage);
+
+    if (!confirmed) {
       return;
     }
 
@@ -256,12 +260,12 @@ export class ContractsListComponent implements OnInit {
         this.applyFilters();
         this.calculateStats();
 
-        // Show success message (optional)
-        console.log('Contract canceled successfully');
+        this.notificationService.success('Contrat annulé avec succès');
       },
       error: (err) => {
         console.error('Error canceling contract:', err);
         this.error = 'Erreur lors de l\'annulation du contrat.';
+        this.notificationService.error('Erreur lors de l\'annulation du contrat.');
       }
     });
   }

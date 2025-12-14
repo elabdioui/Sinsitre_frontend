@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,10 @@ export class NavbarComponent implements OnInit {
   isMenuOpen = false;
   isLoggedIn = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     // Vérifier l'état de connexion initial
@@ -38,12 +42,14 @@ export class NavbarComponent implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  logout(): void {
-    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+  async logout(): Promise<void> {
+    const confirmed = await this.notificationService.confirmAction('Êtes-vous sûr de vouloir vous déconnecter ?');
+    if (confirmed) {
       localStorage.removeItem('token');
       localStorage.removeItem('user'); // Supprimer aussi les données utilisateur
       this.isLoggedIn = false;
       this.isMenuOpen = false;
+      this.notificationService.info('Vous avez été déconnecté');
       this.router.navigate(['/login']);
     }
   }
