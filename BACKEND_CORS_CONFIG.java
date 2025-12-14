@@ -8,6 +8,15 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
+/**
+ * 🔧 Configuration CORS pour permettre au frontend Angular d'accéder au backend
+ *
+ * ⚠️ CE FICHIER DOIT ÊTRE AJOUTÉ DANS VOTRE PROJET BACKEND SPRING BOOT
+ *
+ * Chemin : src/main/java/com/pfa/config/CorsConfig.java
+ *
+ * Après l'avoir ajouté, redémarrez le backend !
+ */
 @Configuration
 public class CorsConfig {
 
@@ -15,21 +24,21 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Autoriser les requêtes depuis le frontend Angular
+        // ✅ Autoriser les requêtes depuis le frontend Angular
         config.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
             "http://127.0.0.1:4200"
         ));
 
-        // Autoriser tous les headers
+        // ✅ Autoriser tous les headers
         config.setAllowedHeaders(Arrays.asList("*"));
 
-        // Autoriser toutes les méthodes HTTP
+        // ✅ Autoriser toutes les méthodes HTTP
         config.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ));
 
-        // Exposer les headers personnalisés RBAC
+        // ✅ Exposer les headers personnalisés RBAC
         config.setExposedHeaders(Arrays.asList(
             "Authorization",
             "X-User-Id",
@@ -37,10 +46,10 @@ public class CorsConfig {
             "Content-Type"
         ));
 
-        // Autoriser les credentials (cookies, authorization headers, etc.)
+        // ✅ Autoriser les credentials (cookies, authorization headers, JWT)
         config.setAllowCredentials(true);
 
-        // Durée du cache preflight (en secondes)
+        // ✅ Durée du cache preflight (en secondes)
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

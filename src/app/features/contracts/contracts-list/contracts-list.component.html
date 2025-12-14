@@ -100,13 +100,13 @@
             </td>
             <td class="td-client">
               <div class="client-cell">
-                <span class="client-name">{{ contract.clientNom || 'N/A' }}</span>
+                <span class="client-name">{{ contract.clientUsername || contract.clientEmail || 'N/A' }}</span>
                 <span class="client-email">{{ contract.clientEmail || '-' }}</span>
               </div>
             </td>
             <td class="td-price">{{ formatCurrency(contract.primeAnnuelle) }}</td>
-            <td class="td-date">{{ formatDate(contract.startDate) }}</td>
-            <td class="td-date">{{ formatDate(contract.endDate) }}</td>
+            <td class="td-date">{{ formatDate(contract.dateDebut) }}</td>
+            <td class="td-date">{{ formatDate(contract.dateFin) }}</td>
             <td class="td-status">
               <span class="status-badge" [ngClass]="getStatusBadgeClass(contract.statut)">
                 {{ getStatusLabel(contract.statut) }}

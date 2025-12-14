@@ -39,22 +39,22 @@ export class LoginComponent {
     this.isError = false;
     this.jwtToken = null;
 
+    console.log('🔐 Tentative de connexion avec:', {
+      username: this.credentials.username,
+      passwordLength: this.credentials.password.length
+    });
+
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        // Stocker le token
-        localStorage.setItem('token', response.token);
+        // Le AuthService gère déjà le stockage via tap()
+        // Pas besoin de dupliquer ici
 
-        // Stocker les données utilisateur avec id et role
-        const user = {
-          id: response.userId || response.id,
-          email: response.email || this.credentials.username,
-          nom: response.nom || 'User',
-          prenom: response.prenom || '',
-          role: response.role || 'CLIENT'
-        };
-        localStorage.setItem('user', JSON.stringify(user));
-
-        console.log('Connexion réussie:', user);
+        console.log('✅ Connexion réussie:', {
+          userId: response.userId,
+          email: response.email,
+          role: response.role,
+          username: response.username
+        });
 
         // 👉 on le met aussi dans une variable pour l'afficher
         this.jwtToken = response.token;
@@ -62,15 +62,53 @@ export class LoginComponent {
         this.isError = false;
         this.message = 'Connexion réussie ✅';
 
-        // Redirection vers l'URL demandée ou le dashboard
-        setTimeout(() => {
-          this.router.navigate([this.returnUrl]);
-        }, 1500);
+        // Redirection basée sur le rôle
+        const userRole = response.role;
+        let redirectPath = this.returnUrl;
+
+        // Si pas d'URL de retour spécifique, rediriger selon le rôle
+        if (this.returnUrl === '/admin/dashboard') {
+          if (userRole === 'CLIENT') {
+            redirectPath = '/admin/contracts'; // Client voit ses contrats
+          } else if (userRole === 'GESTIONNAIRE' || userRole === 'ADMIN') {
+            redirectPath = '/admin/dashboard'; // Admin/Gestionnaire vers dashboard
+          }
+        }
+
+        console.log('🚀 Redirection vers:', redirectPath);
+
+        // Navigation immédiate après que le token soit stocké
+        this.router.navigate([redirectPath]).then(
+          success => console.log('✅ Navigation réussie:', success),
+          error => console.error('❌ Erreur navigation:', error)
+        );
       },
       error: (err) => {
-        console.error('LOGIN ERROR =>', err);
+        console.error('❌ LOGIN ERROR - Objet complet:', err);
+        console.error('❌ LOGIN ERROR - Détails:', {
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error,
+          message: err.message,
+          url: err.url,
+          name: err.name,
+          headers: err.headers
+        });
         this.isError = true;
-        this.message = err.error?.message || 'Échec de connexion. Vérifie tes identifiants.';
+
+        // Message d'erreur plus détaillé
+        if (err.status === 401) {
+          this.message = '🔒 Identifiants incorrects. Vérifie ton username et mot de passe.';
+        } else if (err.status === 0 || err.status === undefined) {
+          this.message = '🚫 Impossible de contacter le serveur. Problème CORS ou backend non démarré. Vérifie la console (F12).';
+        } else if (err.status === 403) {
+          this.message = '⛔ Accès interdit par le serveur (403).';
+        } else if (err.status >= 500) {
+          this.message = `💥 Erreur serveur (${err.status}). Vérifie les logs du backend.`;
+        } else {
+          const errorMsg = err.error?.message || err.message || 'Erreur inconnue';
+          this.message = `❌ Erreur: ${errorMsg}`;
+        }
       }
     });
   }

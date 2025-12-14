@@ -1,128 +1,43 @@
-// src/app/models/sinistre.model.ts
-
-/** 📊 Statuts possibles d'un sinistre */
-export enum SinistreStatus {
-  /** Sinistre déclaré, en attente de traitement */
+export enum StatutSinistre {
   DECLARE = 'DECLARE',
-
-  /** Sinistre en cours de traitement */
   EN_COURS = 'EN_COURS',
-
-  /** Sinistre validé, prêt pour indemnisation */
   VALIDE = 'VALIDE',
-
-  /** Sinistre rejeté */
   REJETE = 'REJETE',
-
-  /** Indemnisation effectuée */
   INDEMNISE = 'INDEMNISE'
 }
 
-/** 📋 Interface principale pour un Sinistre */
+export { StatutSinistre as SinistreStatus };
+
 export interface Sinistre {
-  /** ID unique du sinistre */
   id?: number;
-
-  /** Numéro de sinistre généré (ex: "SIN-ABC12345") */
   numeroSinistre?: string;
-
-  /** ID du client déclarant */
-  clientId: number;
-
-  /** ID du contrat concerné */
-  contractId: number;
-
-  /** Description détaillée du sinistre */
   description: string;
-
-  /** Date du sinistre (format ISO) */
   dateSinistre?: string;
-
-  /** Date de déclaration (auto-générée) */
   dateDeclaration?: string;
-
-  /** Montant demandé par le client */
   montantDemande: number;
-
-  /** Montant approuvé par le gestionnaire */
   montantApprouve?: number;
-
-  /** Statut actuel du sinistre */
-  statut: SinistreStatus;
-
-  // Données enrichies
-  /** Nom complet du client (enrichi) */
+  statut: StatutSinistre;
+  clientId: number;
+  contratId: number;
+  gestionnaireId?: number;
   clientNom?: string;
-
-  /** Email du client (enrichi) */
   clientEmail?: string;
+  gestionnaireNom?: string;
+  gestionnaireEmail?: string;
 }
 
-/** ✏️ DTO pour la création d'un sinistre */
-export interface SinistreCreateDTO {
-  clientId: number;
-  contractId: number;
+export interface CreateSinistreDTO {
+  contratId: number;
   description: string;
   dateSinistre: string;
   montantDemande: number;
 }
 
-/** 🔄 DTO pour la mise à jour du statut d'un sinistre */
-export interface SinistreUpdateStatusDTO {
-  statut: SinistreStatus;
+export interface UpdateStatutDTO {
+  statut: StatutSinistre;
   montantApprouve?: number;
 }
 
-/** 📊 Configuration des statuts pour l'affichage */
-export const SinistreStatusConfig = {
-  [SinistreStatus.DECLARE]: {
-    label: '📝 Déclaré',
-    color: 'info',
-    badgeClass: 'badge-declare',
-    emoji: '📝'
-  },
-  [SinistreStatus.EN_COURS]: {
-    label: '⏳ En cours',
-    color: 'warning',
-    badgeClass: 'badge-encours',
-    emoji: '⏳'
-  },
-  [SinistreStatus.VALIDE]: {
-    label: '✅ Validé',
-    color: 'success',
-    badgeClass: 'badge-valide',
-    emoji: '✅'
-  },
-  [SinistreStatus.REJETE]: {
-    label: '❌ Rejeté',
-    color: 'danger',
-    badgeClass: 'badge-rejete',
-    emoji: '❌'
-  },
-  [SinistreStatus.INDEMNISE]: {
-    label: '💰 Indemnisé',
-    color: 'success',
-    badgeClass: 'badge-indemnise',
-    emoji: '💰'
-  }
-};
-
-/** 🎨 Helper pour obtenir le label d'un statut */
-export function getSinistreStatusLabel(status: SinistreStatus): string {
-  return SinistreStatusConfig[status]?.label || status;
-}
-
-/** 🎨 Helper pour obtenir la classe CSS d'un statut */
-export function getSinistreStatusBadgeClass(status: SinistreStatus): string {
-  return SinistreStatusConfig[status]?.badgeClass || '';
-}
-
-/** 🎨 Helper pour obtenir l'emoji d'un statut */
-export function getSinistreStatusEmoji(status: SinistreStatus): string {
-  return SinistreStatusConfig[status]?.emoji || '📋';
-}
-
-/** 📊 Interface pour les statistiques des sinistres */
 export interface SinistreStats {
   total: number;
   declare: number;
@@ -130,18 +45,105 @@ export interface SinistreStats {
   valide: number;
   rejete: number;
   indemnise: number;
+  montantTotalDemande?: number;
+  montantTotalApprouve?: number;
 }
 
-/** 🎯 Actions possibles sur un sinistre selon son statut */
-export const SinistreActions: Record<SinistreStatus, SinistreStatus[]> = {
-  [SinistreStatus.DECLARE]: [SinistreStatus.EN_COURS, SinistreStatus.REJETE],
-  [SinistreStatus.EN_COURS]: [SinistreStatus.VALIDE, SinistreStatus.REJETE],
-  [SinistreStatus.VALIDE]: [SinistreStatus.INDEMNISE],
-  [SinistreStatus.REJETE]: [],
-  [SinistreStatus.INDEMNISE]: []
+export const StatutSinistreConfig: Record<StatutSinistre, {
+  label: string;
+  color: string;
+  badgeClass: string;
+  emoji: string;
+  description: string;
+}> = {
+  [StatutSinistre.DECLARE]: {
+    label: '📝 Déclaré',
+    color: 'info',
+    badgeClass: 'badge-declare',
+    emoji: '📝',
+    description: 'En attente de prise en charge'
+  },
+  [StatutSinistre.EN_COURS]: {
+    label: '⏳ En cours',
+    color: 'warning',
+    badgeClass: 'badge-encours',
+    emoji: '⏳',
+    description: 'En cours de traitement'
+  },
+  [StatutSinistre.VALIDE]: {
+    label: '✅ Validé',
+    color: 'success',
+    badgeClass: 'badge-valide',
+    emoji: '✅',
+    description: 'Validé'
+  },
+  [StatutSinistre.REJETE]: {
+    label: '❌ Rejeté',
+    color: 'danger',
+    badgeClass: 'badge-rejete',
+    emoji: '❌',
+    description: 'Rejeté'
+  },
+  [StatutSinistre.INDEMNISE]: {
+    label: '💰 Indemnisé',
+    color: 'success',
+    badgeClass: 'badge-indemnise',
+    emoji: '💰',
+    description: 'Indemnisé'
+  }
 };
 
-/** 🔄 Helper pour vérifier si un statut peut être changé */
-export function canChangeStatus(currentStatus: SinistreStatus, newStatus: SinistreStatus): boolean {
-  return SinistreActions[currentStatus]?.includes(newStatus) || false;
+export const SinistreActions: Record<StatutSinistre, StatutSinistre[]> = {
+  [StatutSinistre.DECLARE]: [StatutSinistre.EN_COURS, StatutSinistre.REJETE],
+  [StatutSinistre.EN_COURS]: [StatutSinistre.VALIDE, StatutSinistre.REJETE],
+  [StatutSinistre.VALIDE]: [StatutSinistre.INDEMNISE],
+  [StatutSinistre.REJETE]: [],
+  [StatutSinistre.INDEMNISE]: []
+};
+
+export function getStatutSinistreLabel(statut: StatutSinistre): string {
+  return StatutSinistreConfig[statut]?.label || statut;
+}
+
+export function getStatutSinistreBadgeClass(statut: StatutSinistre): string {
+  return StatutSinistreConfig[statut]?.badgeClass || '';
+}
+
+export function getStatutSinistreEmoji(statut: StatutSinistre): string {
+  return StatutSinistreConfig[statut]?.emoji || '📋';
+}
+
+export function canChangeStatut(currentStatut: StatutSinistre, newStatut: StatutSinistre): boolean {
+  return SinistreActions[currentStatut]?.includes(newStatut) || false;
+}
+
+export function isStatutFinal(statut: StatutSinistre): boolean {
+  return SinistreActions[statut]?.length === 0;
+}
+
+export function formatMontant(montant: number | undefined): string {
+  if (montant === undefined || montant === null) return '—';
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(montant);
+}
+
+export function formatDateSinistre(dateStr: string | undefined): string {
+  if (!dateStr) return '—';
+  try {
+    return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(dateStr));
+  } catch {
+    return dateStr;
+  }
+}
+
+export function calculateSinistreStats(sinistres: Sinistre[]): SinistreStats {
+  return {
+    total: sinistres.length,
+    declare: sinistres.filter(s => s.statut === StatutSinistre.DECLARE).length,
+    enCours: sinistres.filter(s => s.statut === StatutSinistre.EN_COURS).length,
+    valide: sinistres.filter(s => s.statut === StatutSinistre.VALIDE).length,
+    rejete: sinistres.filter(s => s.statut === StatutSinistre.REJETE).length,
+    indemnise: sinistres.filter(s => s.statut === StatutSinistre.INDEMNISE).length,
+    montantTotalDemande: sinistres.reduce((sum, s) => sum + (s.montantDemande || 0), 0),
+    montantTotalApprouve: sinistres.reduce((sum, s) => sum + (s.montantApprouve || 0), 0)
+  };
 }

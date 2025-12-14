@@ -66,24 +66,34 @@
                 autocomplete="off"
               >
                 <div class="field">
-                  <label>Client ID *</label>
-                  <input
-                    type="number"
+                  <label>Client *</label>
+                  <select
                     [(ngModel)]="newContract.clientId"
                     name="clientId"
                     required
-                  />
+                    [disabled]="loadingClients"
+                  >
+                    <option [value]="0" disabled>
+                      {{ loadingClients ? 'Chargement des clients...' : 'Sélectionnez un client' }}
+                    </option>
+                    <option *ngFor="let client of clients" [value]="client.id">
+                      {{ getClientFullName(client) }} - {{ client.email }}
+                    </option>
+                  </select>
                 </div>
 
                 <div class="field">
                   <label>Type de contrat *</label>
-                  <input
-                    type="text"
+                  <select
                     [(ngModel)]="newContract.type"
                     name="type"
-                    placeholder="Auto, Habitation..."
                     required
-                  />
+                  >
+                    <option [value]="TypeContrat.AUTO">🚗 Automobile</option>
+                    <option [value]="TypeContrat.HABITATION">🏠 Habitation</option>
+                    <option [value]="TypeContrat.SANTE">❤️ Santé</option>
+                    <option [value]="TypeContrat.VIE">💼 Vie</option>
+                  </select>
                 </div>
 
                 <div class="field">
@@ -100,8 +110,8 @@
                   <label>Début du contrat *</label>
                   <input
                     type="date"
-                    [(ngModel)]="newContract.startDate"
-                    name="startDate"
+                    [(ngModel)]="newContract.dateDebut"
+                    name="dateDebut"
                     required
                   />
                 </div>
@@ -110,8 +120,8 @@
                   <label>Fin du contrat *</label>
                   <input
                     type="date"
-                    [(ngModel)]="newContract.endDate"
-                    name="endDate"
+                    [(ngModel)]="newContract.dateFin"
+                    name="dateFin"
                     required
                   />
                 </div>

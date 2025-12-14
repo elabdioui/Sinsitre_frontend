@@ -79,13 +79,19 @@ export class CreateSinistreComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
+    // Convertir la date au format ISO avec heure (LocalDateTime attendu par le backend)
+    const sinistreData = {
+      ...this.sinistre,
+      dateSinistre: this.sinistre.dateSinistre + 'T00:00:00'  // Ajouter l'heure
+    };
+
     // 🔍 LOG: Données envoyées au backend
     console.log('=== CRÉATION SINISTRE ===');
-    console.log('Données du formulaire:', this.sinistre);
+    console.log('Données du formulaire:', sinistreData);
     console.log('User dans localStorage:', localStorage.getItem('user'));
     console.log('Token:', localStorage.getItem('token') ? 'Présent' : 'Absent');
 
-    this.sinistreService.create(this.sinistre).subscribe({
+    this.sinistreService.create(sinistreData).subscribe({
       next: (created) => {
         console.log('✅ Sinistre créé avec succès:', created);
         this.success = true;

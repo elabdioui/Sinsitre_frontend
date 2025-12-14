@@ -112,6 +112,20 @@
           <span class="info-label">👤 Client:</span>
           <span class="info-value">{{ sinistre.clientNom || 'Non renseigné' }}</span>
         </div>
+        <!-- ✅ Gestionnaire assigné -->
+        <div class="info-row gestionnaire-row" *ngIf="sinistre.gestionnaireId">
+          <span class="info-label">👨‍💼 Traité par:</span>
+          <span class="info-value gestionnaire-info">
+            <span class="gestionnaire-name">{{ sinistre.gestionnaireNom || 'Gestionnaire #' + sinistre.gestionnaireId }}</span>
+            <small class="gestionnaire-email" *ngIf="sinistre.gestionnaireEmail && sinistre.gestionnaireEmail !== 'N/A'">
+              ({{ sinistre.gestionnaireEmail }})
+            </small>
+          </span>
+        </div>
+        <div class="info-row" *ngIf="!sinistre.gestionnaireId && sinistre.statut !== 'DECLARE'">
+          <span class="info-label">👨‍💼 Traité par:</span>
+          <span class="info-value non-assigne">⚠️ Non assigné</span>
+        </div>
 
         <div class="info-row">
           <span class="info-label">📧 Email:</span>
@@ -134,21 +148,21 @@
         </div>
       </div>
 
-      <!-- Actions de changement de statut -->
-      <div class="card-footer">
+      <!-- Actions de changement de statut (GESTIONNAIRE uniquement) -->
+      <div class="card-footer" *ngIf="!isClient()">
         <div class="status-actions">
           <button
             *ngIf="sinistre.statut === SinistreStatus.DECLARE"
             class="btn btn-sm btn-info"
-            (click)="updateStatut(sinistre, SinistreStatus.EN_COURS)"
+            (click)="openGestionModal(sinistre, SinistreStatus.EN_COURS)"
           >
-            ⏳ Passer en cours
+            ⏳ Prendre en charge
           </button>
 
           <button
             *ngIf="sinistre.statut === SinistreStatus.EN_COURS"
             class="btn btn-sm btn-success"
-            (click)="updateStatut(sinistre, SinistreStatus.VALIDE)"
+            (click)="openGestionModal(sinistre, SinistreStatus.VALIDE)"
           >
             ✅ Valider
           </button>
@@ -156,7 +170,7 @@
           <button
             *ngIf="sinistre.statut === SinistreStatus.EN_COURS"
             class="btn btn-sm btn-danger"
-            (click)="updateStatut(sinistre, SinistreStatus.REJETE)"
+            (click)="openGestionModal(sinistre, SinistreStatus.REJETE)"
           >
             ❌ Rejeter
           </button>
@@ -164,12 +178,111 @@
           <button
             *ngIf="sinistre.statut === SinistreStatus.VALIDE"
             class="btn btn-sm btn-warning"
-            (click)="updateStatut(sinistre, SinistreStatus.INDEMNISE)"
+            (click)="openGestionModal(sinistre, SinistreStatus.INDEMNISE)"
           >
             💰 Indemniser
           </button>
+
+          <button
+            class="btn btn-sm btn-secondary"
+            (click)="openGestionModal(sinistre, sinistre.statut)"
+          >
+            ⚙️ Gérer
+          </button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de gestion du sinistre -->
+<div class="modal-overlay" *ngIf="showGestionModal" (click)="closeGestionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚙️ Gestion du Sinistre #{{ selectedSinistre?.numeroSinistre }}</h2>
+      <button class="btn-close" (click)="closeGestionModal()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedSinistre">
+      <!-- Informations du sinistre -->
+      <div class="info-section">
+        <h3>📋 Informations</h3>
+        <div class="info-grid">
+          <div><strong>Client:</strong> {{ selectedSinistre.clientNom }}</div>
+          <div><strong>Contrat:</strong> #{{ selectedSinistre.contratId }}</div>
+          <div><strong>Date:</strong> {{ selectedSinistre.dateSinistre | date:'dd/MM/yyyy' }}</div>
+          <div><strong>Montant demandé:</strong> {{ formatMontant(selectedSinistre.montantDemande) }}</div>
+        </div>
+        <div class="description-box">
+          <strong>Description:</strong>
+          <p>{{ selectedSinistre.description }}</p>
+        </div>
+      </div>
+
+      <!-- Changement de statut -->
+      <div class="form-section">
+        <h3>🔄 Changement de Statut</h3>
+
+        <div class="form-group">
+          <label>Nouveau statut:</label>
+          <select [(ngModel)]="newStatut" class="form-control">
+            <option [value]="SinistreStatus.DECLARE">📝 Déclaré</option>
+            <option [value]="SinistreStatus.EN_COURS">⏳ En cours</option>
+            <option [value]="SinistreStatus.VALIDE">✅ Validé</option>
+            <option [value]="SinistreStatus.REJETE">❌ Rejeté</option>
+            <option [value]="SinistreStatus.INDEMNISE">💰 Indemnisé</option>
+          </select>
+        </div>
+
+        <!-- Montant approuvé (si validation ou indemnisation) -->
+        <div class="form-group" *ngIf="newStatut === SinistreStatus.VALIDE || newStatut === SinistreStatus.INDEMNISE">
+          <label>💰 Montant approuvé (€):</label>
+          <input
+            type="number"
+            [(ngModel)]="montantApprouve"
+            class="form-control"
+            [placeholder]="'Montant demandé: ' + selectedSinistre.montantDemande + ' €'"
+            min="0"
+            step="0.01"
+          />
+          <small class="form-hint">
+            Montant demandé: {{ formatMontant(selectedSinistre.montantDemande) }}
+          </small>
+        </div>
+
+        <!-- Note interne -->
+        <div class="form-group">
+          <label>📝 Note interne (optionnel):</label>
+          <textarea
+            [(ngModel)]="noteInterne"
+            class="form-control"
+            rows="3"
+            placeholder="Commentaire pour le suivi interne..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Historique (simulé) -->
+      <div class="info-section" *ngIf="selectedSinistre.gestionnaireId">
+        <h3>👤 Gestionnaire Assigné</h3>
+        <div class="info-grid">
+          <div><strong>Nom:</strong> {{ selectedSinistre.gestionnaireNom || 'Non assigné' }}</div>
+          <div><strong>Email:</strong> {{ selectedSinistre.gestionnaireEmail || 'N/A' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeGestionModal()">
+        Annuler
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="confirmStatutChange()"
+        [disabled]="processingStatut"
+      >
+        {{ processingStatut ? '⏳ En cours...' : '✅ Confirmer' }}
+      </button>
     </div>
   </div>
 </div>

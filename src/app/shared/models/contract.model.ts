@@ -1,4 +1,4 @@
-export type ContractStatus = 'ACTIVE' | 'CANCELED' | 'EXPIRED';
+export type ContractStatus = 'ACTIVE' | 'ACTIF' | 'CANCELED' | 'EXPIRED';
 
 export enum TypeContrat {
   AUTO = 'AUTO',
@@ -13,9 +13,10 @@ export interface Contract {
   numero?: string;
   type: TypeContrat;
   primeAnnuelle?: number;
-  startDate?: string;
-  endDate?: string;
+  dateDebut?: string;
+  dateFin?: string;
   statut?: ContractStatus;
+  clientUsername?: string;
   clientNom?: string;
   clientEmail?: string;
 }
@@ -26,4 +27,5 @@ export interface ContractCreateDTO {
   primeAnnuelle: number;
   startDate: string;
   endDate: string;
+  statut?: ContractStatus;
 }

@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { ContractService } from '../../../core/services/contract.service';
-import { Contract, ContractStatus } from '../../../shared/models/contract.model';
+import { UserService, User } from '../../../core/services/user.service';
+import { Contract, ContractStatus, TypeContrat } from '../../../shared/models/contract.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -16,7 +17,9 @@ import { Contract, ContractStatus } from '../../../shared/models/contract.model'
 })
 export class AdminDashboardComponent implements OnInit {
   contracts: Contract[] = [];
+  clients: User[] = [];
   loading = false;
+  loadingClients = false;
   error: string | null = null;
 
   creating = false;
@@ -29,18 +32,60 @@ export class AdminDashboardComponent implements OnInit {
     EXPIRED: 'EXPIRED' as ContractStatus,
   };
 
+  // Enum pour le template
+  readonly TypeContrat = TypeContrat;
+
   newContract: Contract = {
     clientId: 0,
-    type: 'AUTO' as any,
+    type: TypeContrat.AUTO,
     primeAnnuelle: 0,
-    startDate: '',
-    endDate: '',
+    dateDebut: '',
+    dateFin: '',
   };
 
-  constructor(private contractService: ContractService) {}
+  constructor(
+    private contractService: ContractService,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {
     this.loadContracts();
+    this.loadClients();
+  }
+
+  /**
+   * Charger tous les clients
+   */
+  loadClients(): void {
+    this.loadingClients = true;
+    console.log('🔍 Chargement des clients...');
+
+    this.userService.getAllClients().subscribe({
+      next: (data) => {
+        console.log('✅ Clients récupérés:', data);
+        console.log('Nombre de clients:', data.length);
+        this.clients = data;
+        this.loadingClients = false;
+      },
+      error: (err) => {
+        console.error('❌ Erreur chargement clients:', err);
+        console.error('Status:', err.status);
+        console.error('URL appelée:', err.url);
+        console.error('Message:', err.message);
+        this.loadingClients = false;
+
+        // Afficher l'erreur à l'utilisateur
+        this.createError = `Impossible de charger les clients: ${err.status} - ${err.statusText || err.message}`;
+      }
+    });
+  }
+
+  /**
+   * Obtenir le nom d'affichage d'un client
+   */
+  getClientFullName(client: User): string {
+    // Utiliser username car nom/prenom sont souvent null
+    return client.username || client.email || 'Utilisateur';
   }
 
   // --- Statistiques rapides ---
@@ -99,10 +144,10 @@ export class AdminDashboardComponent implements OnInit {
       next: () => {
         this.newContract = {
           clientId: 0,
-          type: 'AUTO' as any,
+          type: TypeContrat.AUTO,
           primeAnnuelle: 0,
-          startDate: '',
-          endDate: '',
+          dateDebut: '',
+          dateFin: '',
         };
         this.creating = false;
         this.loadContracts();

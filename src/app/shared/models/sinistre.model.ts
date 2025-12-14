@@ -29,6 +29,8 @@ export interface Sinistre {
   // Données enrichies
   clientNom?: string;
   clientEmail?: string;
+  gestionnaireNom?: string;
+  gestionnaireEmail?: string;
 }
 
 /** ✏️ DTO pour la création d'un sinistre */

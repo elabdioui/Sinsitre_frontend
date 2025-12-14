@@ -51,21 +51,31 @@ interface HealthCheck {
       </div>
 
       <div class="info-section">
-        <h3>📋 Informations de Connexion</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <strong>Token:</strong>
-            <span [class.present]="hasToken" [class.absent]="!hasToken">
-              {{ hasToken ? '✅ Présent' : '❌ Absent' }}
-            </span>
-          </div>
-          <div class="info-item">
-            <strong>User ID:</strong>
-            <span>{{ userId || 'N/A' }}</span>
-          </div>
-          <div class="info-item">
-            <strong>Rôle:</strong>
-            <span>{{ userRole || 'N/A' }}</span>
+        <h3>� Utilisateur Connecté</h3>
+        <div class="user-info-card">
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>👤 Nom:</strong>
+              <span class="highlight">{{ username || 'Non disponible' }}</span>
+            </div>
+            <div class="info-item">
+              <strong>📧 Email:</strong>
+              <span>{{ userEmail || 'Non disponible' }}</span>
+            </div>
+            <div class="info-item">
+              <strong>🆔 User ID:</strong>
+              <span>{{ userId || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <strong>🎭 Rôle:</strong>
+              <span class="role-badge" [ngClass]="getRoleClass()">{{ userRole || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <strong>🔑 Token:</strong>
+              <span [class.present]="hasToken" [class.absent]="!hasToken">
+                {{ hasToken ? '✅ Présent' : '❌ Absent' }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -233,6 +243,40 @@ interface HealthCheck {
       color: #e74c3c;
       font-weight: 600;
     }
+
+    .user-info-card {
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .highlight {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .role-client {
+      background: #3498db;
+      color: white;
+    }
+
+    .role-gestionnaire {
+      background: #f39c12;
+      color: white;
+    }
+
+    .role-admin {
+      background: #e74c3c;
+      color: white;
+    }
   `]
 })
 export class BackendHealthComponent implements OnInit {
@@ -267,6 +311,8 @@ export class BackendHealthComponent implements OnInit {
   hasToken = false;
   userId: string | null = null;
   userRole: string | null = null;
+  userEmail: string | null = null;
+  username: string | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -277,16 +323,25 @@ export class BackendHealthComponent implements OnInit {
 
   loadUserInfo(): void {
     this.hasToken = !!localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        this.userId = user.id?.toString();
-        this.userRole = user.role;
-      } catch (e) {
-        console.error('Erreur parsing user:', e);
-      }
-    }
+    this.userId = localStorage.getItem('userId');
+    this.userRole = localStorage.getItem('userRole');
+    this.userEmail = localStorage.getItem('userEmail');
+    this.username = localStorage.getItem('username');
+
+    console.log('👤 Backend Health - Utilisateur:', {
+      userId: this.userId,
+      userRole: this.userRole,
+      userEmail: this.userEmail,
+      username: this.username,
+      hasToken: this.hasToken
+    });
+  }
+
+  getRoleClass(): string {
+    if (this.userRole === 'CLIENT') return 'role-client';
+    if (this.userRole === 'GESTIONNAIRE') return 'role-gestionnaire';
+    if (this.userRole === 'ADMIN') return 'role-admin';
+    return '';
   }
 
   checkAllServices(): void {
