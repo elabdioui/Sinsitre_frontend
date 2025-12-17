@@ -56,6 +56,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     primeAnnuelle: 0,
     dateDebut: '',
     dateFin: '',
+    statut: 'ACTIVE',
   };
 
   constructor(
@@ -292,6 +293,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
           primeAnnuelle: 0,
           dateDebut: '',
           dateFin: '',
+          statut: 'ACTIVE',
         };
         this.creating = false;
         this.loadContracts();

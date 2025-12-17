@@ -68,18 +68,18 @@
                 <div class="field">
                   <label>Client *</label>
                   <select
-                    [(ngModel)]="newContract.clientId"
-                    name="clientId"
-                    required
-                    [disabled]="loadingClients"
-                  >
-                    <option [value]="0" disabled>
-                      {{ loadingClients ? 'Chargement des clients...' : 'Sélectionnez un client' }}
-                    </option>
-                    <option *ngFor="let client of clients" [value]="client.id">
-                      {{ getClientFullName(client) }} - {{ client.email }}
-                    </option>
-                  </select>
+  [(ngModel)]="newContract.clientId"
+  name="clientId"
+  required
+  [disabled]="loadingClients"
+>
+  <option [ngValue]="0" disabled>
+    {{ loadingClients ? 'Chargement des clients...' : 'Sélectionnez un client' }}
+  </option>
+  <option *ngFor="let client of clients" [ngValue]="client.id">
+    {{ getClientFullName(client) }} - {{ client.email }}
+  </option>
+</select>
                 </div>
 
                 <div class="field">
